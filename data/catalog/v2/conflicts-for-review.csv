@@ -1,0 +1,4 @@
+a,b,kept_weight,kept_source,proposed_weight,proposed_source,note
+Euphoric,Melancholic,0.65,generated,0.3,rule,tension pole
+Fast Tempo,Melancholic,0.65,generated,0.35,claude-curated,Melancholic profile: tension
+Euphoric,Melancholic,0.65,generated,0.1,claude-curated,Melancholic profile: clash

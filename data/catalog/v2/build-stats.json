@@ -1,0 +1,43 @@
+{
+ "styles": 899,
+ "edges_generated": 6449,
+ "edges_total": 9403,
+ "edges_by_source": {
+  "generated": 6449,
+  "inferred": 2366,
+  "claude-curated": 513,
+  "rule": 75
+ },
+ "edges_by_kind": {
+  "affinity": 9118,
+  "tension": 141,
+  "clash": 144
+ },
+ "launch_styles": 187,
+ "launch_pairs": 17391,
+ "launch_pairs_covered_v1": 1084,
+ "launch_pairs_covered_v2": 3988,
+ "launch_pairs_by_source": {
+  "inferred": 2366,
+  "generated": 1084,
+  "claude-curated": 508,
+  "rule": 30
+ },
+ "conflicts": 3,
+ "inferred_added": 2366,
+ "categories": {
+  "rhythm": 75,
+  "era": 24,
+  "texture": 90,
+  "instrument": 161,
+  "vocal": 79,
+  "structure": 61,
+  "genre": 220,
+  "production": 84,
+  "energy": 37,
+  "mood": 68
+ },
+ "source_observed_styles": 178,
+ "launch_source_observed": 106,
+ "aliases": 142
+}

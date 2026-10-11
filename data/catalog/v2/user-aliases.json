@@ -1,0 +1,453 @@
+{
+ "00s": [
+  "2000s"
+ ],
+ "2000s": [
+  "2000s"
+ ],
+ "20s": [
+  "1920s",
+  "2020s"
+ ],
+ "30s": [
+  "1930s"
+ ],
+ "4 on the floor": [
+  "Four-on-the-Floor"
+ ],
+ "4-on-the-floor": [
+  "Four-on-the-Floor"
+ ],
+ "40s": [
+  "1940s"
+ ],
+ "50s": [
+  "1950s"
+ ],
+ "60s": [
+  "1960s"
+ ],
+ "70s": [
+  "1970s"
+ ],
+ "808s": [
+  "808 Drums",
+  "808 Bass"
+ ],
+ "80s": [
+  "1980s"
+ ],
+ "90s": [
+  "1990s"
+ ],
+ "a capella": [
+  "A Cappella"
+ ],
+ "acapella": [
+  "A Cappella"
+ ],
+ "acoustic": [
+  "Acoustic Guitar",
+  "Acoustic Production"
+ ],
+ "airy vocals": [
+  "Breathy Vocals"
+ ],
+ "analog": [
+  "Analog Warmth"
+ ],
+ "analogue warmth": [
+  "Analog Warmth"
+ ],
+ "angry": [
+  "Aggressive"
+ ],
+ "arpeggio": [
+  "Arpeggiated"
+ ],
+ "arpeggios": [
+  "Arpeggiated"
+ ],
+ "auto-tune": [
+  "Hard-Tuned Vocals"
+ ],
+ "autotune": [
+  "Hard-Tuned Vocals"
+ ],
+ "bass": [
+  "Bass Guitar",
+  "Sub-Bass",
+  "Bass Vocals"
+ ],
+ "belt": [
+  "Belted Vocals"
+ ],
+ "belting": [
+  "Belted Vocals"
+ ],
+ "boom-bap": [
+  "Boom Bap"
+ ],
+ "boombap": [
+  "Boom Bap"
+ ],
+ "brass": [
+  "Brass Section"
+ ],
+ "breakup": [
+  "Sad",
+  "Bittersweet"
+ ],
+ "chanted vocals": [
+  "Chanting"
+ ],
+ "chill": [
+  "Relaxed",
+  "Laid-Back Groove"
+ ],
+ "chilled": [
+  "Relaxed",
+  "Laid-Back Groove"
+ ],
+ "chopped vocals": [
+  "Vocal Chops"
+ ],
+ "close mic": [
+  "Close-Miked"
+ ],
+ "close-mic": [
+  "Close-Miked"
+ ],
+ "close-mic recording": [
+  "Close-Miked"
+ ],
+ "creepy": [
+  "Eerie",
+  "Unsettling"
+ ],
+ "d&b": [
+  "Drum and Bass"
+ ],
+ "digital production": [
+  "Electronic Production"
+ ],
+ "dnb": [
+  "Drum and Bass"
+ ],
+ "double time": [
+  "Double-Time Feel"
+ ],
+ "double tracking": [
+  "Double-Tracked Vocals",
+  "Double-Tracked Guitars"
+ ],
+ "doublebass": [
+  "Double Bass"
+ ],
+ "dream-pop": [
+  "Dream Pop"
+ ],
+ "drum & bass": [
+  "Drum and Bass"
+ ],
+ "edm": [
+  "EDM"
+ ],
+ "edm music": [
+  "EDM"
+ ],
+ "electric bass": [
+  "Bass Guitar"
+ ],
+ "electro pop": [
+  "Electropop"
+ ],
+ "emotional": [
+  "Emotional",
+  "Melancholic"
+ ],
+ "epic": [
+  "Epic"
+ ],
+ "falsetto": [
+  "Falsetto Vocals"
+ ],
+ "fast": [
+  "Fast Tempo"
+ ],
+ "female singer": [
+  "Female Vocals"
+ ],
+ "female voice": [
+  "Female Vocals"
+ ],
+ "fender rhodes": [
+  "Electric Piano"
+ ],
+ "film": [
+  "Cinematic"
+ ],
+ "foot stomps": [
+  "Stomps"
+ ],
+ "four on the floor": [
+  "Four-on-the-Floor"
+ ],
+ "four-on-the-floor pulse": [
+  "Four-on-the-Floor"
+ ],
+ "girl": [
+  "Female Vocals"
+ ],
+ "growling": [
+  "Growled Vocals"
+ ],
+ "guy": [
+  "Male Vocals"
+ ],
+ "half time": [
+  "Half-Time Groove"
+ ],
+ "half-time": [
+  "Half-Time Groove"
+ ],
+ "hammond organ": [
+  "Organ"
+ ],
+ "harmonization": [
+  "Vocal Harmonies"
+ ],
+ "heartbreak": [
+  "Sad",
+  "Melancholic"
+ ],
+ "hifi": [
+  "Hi-Fi"
+ ],
+ "high fidelity": [
+  "Hi-Fi"
+ ],
+ "hip hop": [
+  "Hip-Hop"
+ ],
+ "hiphop": [
+  "Hip-Hop"
+ ],
+ "horns": [
+  "Brass Section"
+ ],
+ "hype": [
+  "Energetic",
+  "High Energy"
+ ],
+ "instrumental only": [
+  "Instrumental"
+ ],
+ "late night": [
+  "Nocturnal",
+  "Atmospheric"
+ ],
+ "liquid dnb": [
+  "Liquid Drum and Bass"
+ ],
+ "lo fi": [
+  "Lo-Fi"
+ ],
+ "lofi": [
+  "Lo-Fi",
+  "Lo-Fi Hip-Hop"
+ ],
+ "lofi hip hop": [
+  "Lo-Fi Hip-Hop"
+ ],
+ "lofi hip-hop": [
+  "Lo-Fi Hip-Hop"
+ ],
+ "love song": [
+  "Romantic"
+ ],
+ "low fidelity": [
+  "Lo-Fi"
+ ],
+ "low-end": [
+  "Low End"
+ ],
+ "male singer": [
+  "Male Vocals"
+ ],
+ "male voice": [
+  "Male Vocals"
+ ],
+ "man": [
+  "Male Vocals"
+ ],
+ "mellow": [
+  "Laid-Back"
+ ],
+ "mid-tempo": [
+  "Midtempo"
+ ],
+ "minimal instrumentation": [
+  "Sparse Arrangement"
+ ],
+ "movie": [
+  "Cinematic"
+ ],
+ "night": [
+  "Nocturnal",
+  "Atmospheric"
+ ],
+ "no singing": [
+  "Instrumental"
+ ],
+ "no vocals": [
+  "Instrumental"
+ ],
+ "odd time signature": [
+  "Odd Meter"
+ ],
+ "odd time signatures": [
+  "Odd Meter"
+ ],
+ "orchestra": [
+  "Orchestral"
+ ],
+ "pads": [
+  "Synth Pads"
+ ],
+ "polyrhythm": [
+  "Polyrhythmic"
+ ],
+ "r and b": [
+  "R&B"
+ ],
+ "rap": [
+  "Rap Vocals",
+  "Hip-Hop"
+ ],
+ "rapping": [
+  "Rap Vocals"
+ ],
+ "rhodes": [
+  "Electric Piano"
+ ],
+ "rnb": [
+  "R&B"
+ ],
+ "road trip": [
+  "Driving Rhythm",
+  "Uplifting"
+ ],
+ "scat": [
+  "Scat Vocals"
+ ],
+ "sexy": [
+  "Sensual",
+  "Sultry"
+ ],
+ "shuffle": [
+  "Shuffle Rhythm"
+ ],
+ "sidechain": [
+  "Sidechain Compression"
+ ],
+ "sidechain pump": [
+  "Pumping"
+ ],
+ "slow": [
+  "Slow Tempo"
+ ],
+ "soft distortion-free tone": [
+  "Clean"
+ ],
+ "sparse": [
+  "Sparse Arrangement"
+ ],
+ "spoken-word": [
+  "Spoken Word"
+ ],
+ "spooky": [
+  "Haunting",
+  "Eerie"
+ ],
+ "string ensemble": [
+  "Strings"
+ ],
+ "string section": [
+  "Strings"
+ ],
+ "study": [
+  "Lo-Fi Hip-Hop",
+  "Relaxed"
+ ],
+ "sub bass": [
+  "Sub-Bass"
+ ],
+ "subbass": [
+  "Sub-Bass"
+ ],
+ "summer": [
+  "Bright",
+  "Happy"
+ ],
+ "swing": [
+  "Swing Rhythm"
+ ],
+ "syncopation": [
+  "Syncopated"
+ ],
+ "synth": [
+  "Synthesizer"
+ ],
+ "synth pop": [
+  "Synthpop"
+ ],
+ "synths": [
+  "Synthesizer"
+ ],
+ "tape warmth": [
+  "Analog Warmth"
+ ],
+ "tape wow & flutter": [
+  "Tape Wow and Flutter"
+ ],
+ "tr-808": [
+  "808 Drums"
+ ],
+ "tr-909": [
+  "909 Drums"
+ ],
+ "tribal percussion": [
+  "Layered Percussion"
+ ],
+ "upbeat": [
+  "Upbeat Energy",
+  "Energetic"
+ ],
+ "verse chorus": [
+  "Verse-Chorus Structure"
+ ],
+ "vinyl texture": [
+  "Vinyl Crackle"
+ ],
+ "vocal chop": [
+  "Vocal Chops"
+ ],
+ "whispered": [
+  "Whispered Vocals"
+ ],
+ "woman": [
+  "Female Vocals"
+ ],
+ "workout": [
+  "Energetic",
+  "Driving Rhythm"
+ ],
+ "wow and flutter": [
+  "Tape Wow and Flutter"
+ ],
+ "y2k": [
+  "Y2K Pop",
+  "2000s"
+ ]
+}

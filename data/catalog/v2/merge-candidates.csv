@@ -1,0 +1,21 @@
+style_a,style_b,recommendation
+Bass-Heavy,Bass-Heavy Mix,same meaning; recommend merge
+Breakbeat,Breakbeats,genre vs drum-break rhythm; recommend keep both
+Boom Bap,Boom Bap Beat,genre vs beat; recommend merge
+Bossa Nova,Bossa Groove,Bossa Groove adds little; recommend merge
+Baroque,Baroque Era,genre vs era; recommend merge
+Classical,Classical Era,"Classical Era is too narrow for most users; keep, long-tail"
+Romantic Classical,Romantic Era,same meaning; recommend merge
+Laid-Back,Laid-Back Groove,mood vs rhythm; recommend merge into Laid-Back Groove
+Legato,Legato Phrasing,near-identical; recommend merge
+Delay,Delay Guitar,effect vs instrument; keep both
+Dreamy,Dreamy Ambient,mood vs genre-ish; keep both
+Ethereal,Ethereal Vocals,mood vs vocal; keep both
+Soulful,Soulful Vocals,mood vs vocal; keep both
+Twangy,Twangy Guitar,texture vs instrument; keep both
+Long Reverb,Reverb-Heavy,near-identical in a prompt; recommend merge
+Reverb,Reverb-Heavy,plain 'Reverb' is vague; recommend merge
+Restrained,Restrained Verse,mood vs structure; keep both
+Chorus,Chorus Effect,"song section vs guitar effect; keep both, rename 'Chorus' to 'Chorus Section'"
+Tremolo Guitar,Tremolo Picking,near-identical; recommend merge
+Orchestral,Epic Orchestral,instrumentation vs genre; keep both
