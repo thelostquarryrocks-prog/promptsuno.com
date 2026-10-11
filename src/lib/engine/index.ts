@@ -14,5 +14,5 @@ export {
   orderForStyleField,
 } from "./budget";
 export { STYLE_MAX_CHARS, STYLE_TARGET_CHARS } from "./config";
-export { toWriterContext } from "./writer-context";
+export { toWriterContext, type WriterContextOptions } from "./writer-context";
 export type * from "./types";

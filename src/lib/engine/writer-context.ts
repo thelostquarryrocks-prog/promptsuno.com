@@ -7,11 +7,16 @@ import type { Brief, StyleRole } from "./types";
 const ROLE_LABEL: Record<Exclude<StyleRole, "outlier">, string> = {
   anchor: "Anchor (build around this)",
   core: "Core (fits well)",
-  support: "Support (use lightly)",
+  support: "Support (keep it; fit is loose or untested, so don't let it lead)",
   contrast: "Contrast (deliberate tension, reconcile it)",
 };
 
-export function toWriterContext(brief: Brief): string {
+export interface WriterContextOptions {
+  /** Include the exclude list. The writer lists excludes itself, split into the person's own and candidates. */
+  excludes?: boolean;
+}
+
+export function toWriterContext(brief: Brief, opts: WriterContextOptions = {}): string {
   const lines: string[] = [];
   const ordered = orderForStyleField(brief);
 
@@ -37,7 +42,7 @@ export function toWriterContext(brief: Brief): string {
     lines.push(`Section tags for the lyrics, not the style field: ${sections.join(", ")}`);
   }
 
-  if (brief.exclude.length) {
+  if (opts.excludes !== false && brief.exclude.length) {
     lines.push(`Exclude field: ${brief.exclude.map((e) => e.name).join(", ")}`);
   }
 

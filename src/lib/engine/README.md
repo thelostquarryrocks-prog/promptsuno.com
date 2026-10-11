@@ -23,7 +23,7 @@ To try it from the terminal: `npm run engine -- Piano Cinematic "Driving Rhythm"
    |---|---|
    | `anchor` | The most cohesive genre |
    | `core` | Fits the selection well |
-   | `support` | A loose fit, or unknown |
+   | `support` | A loose fit, or unknown. Still kept: unknown is not unwanted |
    | `contrast` | Has tensions with the selection, but no clash |
    | `outlier` | The weaker side of a clash, so it gets dropped |
 

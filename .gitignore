@@ -45,3 +45,6 @@ __pycache__/
 
 # allow the env template
 !.env.example
+
+# local writer test runs (npm run writer)
+/writer-runs/

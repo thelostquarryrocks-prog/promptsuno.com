@@ -13,7 +13,8 @@
     "catalog:build": "python3 -I scripts/catalog/build_catalog.py data/catalog/v1/suno-style-matrix-v1.json data/catalog/v1/suno-style-catalog-v1.json data/catalog/v2/",
     "catalog:validate": "python3 -I scripts/catalog/validate_catalog.py data/catalog/v2/",
     "engine": "tsx --tsconfig tsconfig.json scripts/engine/inspect.ts",
-    "idea": "tsx --tsconfig tsconfig.json scripts/engine/idea.ts"
+    "idea": "tsx --tsconfig tsconfig.json scripts/engine/idea.ts",
+    "writer": "tsx --tsconfig tsconfig.json scripts/writer/run.ts"
   },
   "dependencies": {
     "next": "16.4.0",
