@@ -27,6 +27,7 @@ npm run dev        # http://localhost:3000
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript, no emit |
 | `npm test` | Unit tests (Vitest) |
+| `npm run engine -- Piano Cinematic "Driving Rhythm"` | Try the style engine from the terminal |
 | `npm run catalog:build` | Rebuild `data/catalog/v2` from the v1 sources |
 | `npm run catalog:validate` | Integrity checks on catalog v2 |
 
@@ -37,6 +38,8 @@ data/catalog/       style catalog: v1 sources, v2 build output, README
 scripts/catalog/    Python build + validation for the catalog
 src/app/            Next.js routes (placeholder until the design lands)
 src/lib/catalog/    typed, server-only access to catalog v2
+src/lib/engine/     the style engine: tags in, brief out (see its README)
+scripts/engine/     terminal tool for trying the engine
 ```
 
 ## Environment

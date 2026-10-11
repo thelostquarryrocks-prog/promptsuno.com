@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "catalog:build": "python3 -I scripts/catalog/build_catalog.py data/catalog/v1/suno-style-matrix-v1.json data/catalog/v1/suno-style-catalog-v1.json data/catalog/v2/",
-    "catalog:validate": "python3 -I scripts/catalog/validate_catalog.py data/catalog/v2/"
+    "catalog:validate": "python3 -I scripts/catalog/validate_catalog.py data/catalog/v2/",
+    "engine": "tsx --tsconfig tsconfig.json scripts/engine/inspect.ts"
   },
   "dependencies": {
     "next": "16.4.0",
@@ -26,6 +27,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.3"
   },
