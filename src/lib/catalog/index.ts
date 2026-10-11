@@ -69,3 +69,27 @@ export function resolveTerm(term: string): Style[] {
   if (exact) return [exact];
   return (aliasesFile[t] ?? []).map((n) => byName.get(n)).filter((s): s is Style => !!s);
 }
+
+let aliasCache: Map<string, string[]> | undefined;
+
+/**
+ * Every alias the catalog knows, lowercased: each style's own aliases plus the
+ * everyday-word list (user-aliases.json). Values are style names, best first.
+ * Used by the idea parser to build its phrase index.
+ */
+export function aliasMap(): ReadonlyMap<string, readonly string[]> {
+  if (aliasCache) return aliasCache;
+  const out = new Map<string, string[]>();
+  const add = (alias: string, name: string) => {
+    const k = alias.trim().toLowerCase();
+    if (!k || !byName.has(name)) return;
+    const list = out.get(k);
+    if (!list) out.set(k, [name]);
+    else if (!list.includes(name)) list.push(name);
+  };
+  // The everyday-word list is curated with a deliberate order; it goes first.
+  for (const [alias, names] of Object.entries(aliasesFile)) for (const n of names) add(alias, n);
+  for (const s of stylesFile.styles) for (const a of s.aliases) add(a, s.name);
+  aliasCache = out;
+  return out;
+}

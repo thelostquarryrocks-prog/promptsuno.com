@@ -7,12 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "catalog:build": "python3 -I scripts/catalog/build_catalog.py data/catalog/v1/suno-style-matrix-v1.json data/catalog/v1/suno-style-catalog-v1.json data/catalog/v2/",
     "catalog:validate": "python3 -I scripts/catalog/validate_catalog.py data/catalog/v2/",
-    "engine": "tsx --tsconfig tsconfig.json scripts/engine/inspect.ts"
+    "engine": "tsx --tsconfig tsconfig.json scripts/engine/inspect.ts",
+    "idea": "tsx --tsconfig tsconfig.json scripts/engine/idea.ts"
   },
   "dependencies": {
     "next": "16.4.0",

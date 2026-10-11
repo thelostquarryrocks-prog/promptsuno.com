@@ -50,6 +50,9 @@
   "Acoustic Guitar",
   "Acoustic Production"
  ],
+ "acoustic drums": [
+  "Drum Kit"
+ ],
  "airy vocals": [
   "Breathy Vocals"
  ],
@@ -61,6 +64,9 @@
  ],
  "angry": [
   "Aggressive"
+ ],
+ "angst": [
+  "Angsty"
  ],
  "arpeggio": [
   "Arpeggiated"
@@ -74,6 +80,10 @@
  "autotune": [
   "Hard-Tuned Vocals"
  ],
+ "banger": [
+  "High Energy",
+  "Anthemic"
+ ],
  "bass": [
   "Bass Guitar",
   "Sub-Bass",
@@ -84,6 +94,9 @@
  ],
  "belting": [
   "Belted Vocals"
+ ],
+ "bluesy": [
+  "Blues"
  ],
  "boom-bap": [
   "Boom Bap"
@@ -128,6 +141,9 @@
  "d&b": [
   "Drum and Bass"
  ],
+ "dancey": [
+  "Danceable"
+ ],
  "digital production": [
   "Electronic Production"
  ],
@@ -147,8 +163,15 @@
  "dream-pop": [
   "Dream Pop"
  ],
+ "driving": [
+  "Driving Rhythm"
+ ],
  "drum & bass": [
   "Drum and Bass"
+ ],
+ "drums": [
+  "Drum Kit",
+  "Programmed Drums"
  ],
  "edm": [
   "EDM"
@@ -187,6 +210,9 @@
  "film": [
   "Cinematic"
  ],
+ "folky": [
+  "Folk"
+ ],
  "foot stomps": [
   "Stomps"
  ],
@@ -196,11 +222,19 @@
  "four-on-the-floor pulse": [
   "Four-on-the-Floor"
  ],
+ "funky": [
+  "Funk",
+  "Groovy"
+ ],
  "girl": [
   "Female Vocals"
  ],
  "growling": [
   "Growled Vocals"
+ ],
+ "guitar": [
+  "Electric Guitar",
+  "Acoustic Guitar"
  ],
  "guy": [
   "Male Vocals"
@@ -243,12 +277,22 @@
  "instrumental only": [
   "Instrumental"
  ],
+ "jazzy": [
+  "Jazz"
+ ],
+ "keys": [
+  "Piano",
+  "Electric Piano"
+ ],
  "late night": [
   "Nocturnal",
   "Atmospheric"
  ],
  "liquid dnb": [
   "Liquid Drum and Bass"
+ ],
+ "live drums": [
+  "Drum Kit"
  ],
  "lo fi": [
   "Lo-Fi"
@@ -262,6 +306,10 @@
  ],
  "lofi hip-hop": [
   "Lo-Fi Hip-Hop"
+ ],
+ "lonely": [
+  "Melancholic",
+  "Vulnerable"
  ],
  "love song": [
   "Romantic"
@@ -290,6 +338,10 @@
  "minimal instrumentation": [
   "Sparse Arrangement"
  ],
+ "moody": [
+  "Brooding",
+  "Dark"
+ ],
  "movie": [
   "Cinematic"
  ],
@@ -315,15 +367,31 @@
  "pads": [
   "Synth Pads"
  ],
+ "percussion": [
+  "Hand Percussion"
+ ],
  "polyrhythm": [
   "Polyrhythmic"
+ ],
+ "poppy": [
+  "Pop"
+ ],
+ "punk": [
+  "Punk Rock",
+  "Pop Punk"
  ],
  "r and b": [
   "R&B"
  ],
+ "rain": [
+  "Rainy"
+ ],
  "rap": [
   "Rap Vocals",
   "Hip-Hop"
+ ],
+ "rapper": [
+  "Rap Vocals"
  ],
  "rapping": [
   "Rap Vocals"
@@ -337,6 +405,12 @@
  "road trip": [
   "Driving Rhythm",
   "Uplifting"
+ ],
+ "sadness": [
+  "Sad"
+ ],
+ "sax": [
+  "Saxophone"
  ],
  "scat": [
   "Scat Vocals"
@@ -370,6 +444,9 @@
   "Haunting",
   "Eerie"
  ],
+ "standup bass": [
+  "Double Bass"
+ ],
  "string ensemble": [
   "Strings"
  ],
@@ -377,6 +454,10 @@
   "Strings"
  ],
  "study": [
+  "Lo-Fi Hip-Hop",
+  "Relaxed"
+ ],
+ "studying": [
   "Lo-Fi Hip-Hop",
   "Relaxed"
  ],
@@ -420,9 +501,15 @@
  "tribal percussion": [
   "Layered Percussion"
  ],
+ "uke": [
+  "Ukulele"
+ ],
  "upbeat": [
   "Upbeat Energy",
   "Energetic"
+ ],
+ "upright bass": [
+  "Double Bass"
  ],
  "verse chorus": [
   "Verse-Chorus Structure"
@@ -438,6 +525,10 @@
  ],
  "woman": [
   "Female Vocals"
+ ],
+ "working out": [
+  "Energetic",
+  "Driving Rhythm"
  ],
  "workout": [
   "Energetic",

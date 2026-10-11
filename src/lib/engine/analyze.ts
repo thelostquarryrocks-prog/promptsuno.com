@@ -128,6 +128,7 @@ function suggest(
   allNames: string[],
   roles: Map<string, StyleRole>,
   options: Required<AnalyzeOptions>,
+  avoid: ReadonlySet<string>,
 ): Suggestion[] {
   // Suggestions build on what the engine would keep: outliers are excluded from the basis.
   const names = allNames.filter((n) => roles.get(n) !== "outlier");
@@ -150,7 +151,7 @@ function suggest(
   const required = Math.min(2, names.length);
   const scored: Suggestion[] = [];
   for (const c of candidates) {
-    if (selected.has(c) || blockedByGroup.has(c) || SECTION_TAGS.has(c)) continue;
+    if (selected.has(c) || avoid.has(c) || blockedByGroup.has(c) || SECTION_TAGS.has(c)) continue;
     const style = getStyle(c)!;
     if (options.library === "launch" && !style.launch) continue;
 
@@ -190,7 +191,15 @@ function excludeList(
   names: string[],
   roles: Map<string, StyleRole>,
   options: Required<AnalyzeOptions>,
+  userExcludes: readonly string[],
 ): ExcludeItem[] {
+  const user: ExcludeItem[] = userExcludes.map((name) => ({
+    name,
+    category: getStyle(name)!.category,
+    reason: "user",
+    clashesWith: [],
+  }));
+  const userSet = new Set(userExcludes);
   const keep = names.filter((n) => roles.get(n) !== "outlier");
   const selected = new Set(names);
   const clashTotals = new Map<string, { score: number; with: string[] }>();
@@ -199,7 +208,7 @@ function excludeList(
     for (const e of getNeighbors(n)) {
       if (e.kind !== "clash") continue;
       const other = e.a === n ? e.b : e.a;
-      if (selected.has(other)) continue;
+      if (selected.has(other) || userSet.has(other)) continue;
       const entry = clashTotals.get(other) ?? { score: 0, with: [] };
       entry.score += SOURCE_TRUST[e.source] * (1 - e.weight);
       entry.with.push(n);
@@ -220,12 +229,13 @@ function excludeList(
     if (alsoFits) continue;
     // Suno's exclude field works best on concrete sound sources; moods and energy rank lower.
     const weight = CONCRETE_EXCLUDES.has(style.category) ? 1 : 0.6;
-    items.push({ name, category: style.category, clashesWith, score: score * weight });
+    items.push({ name, category: style.category, reason: "clash", clashesWith, score: score * weight });
   }
   items.sort((p, q) => q.score - p.score || p.name.localeCompare(q.name));
-  return items
-    .slice(0, options.maxExcludes)
-    .map(({ name, category, clashesWith }) => ({ name, category, clashesWith }));
+  const found = items
+    .slice(0, Math.max(0, options.maxExcludes - user.length))
+    .map(({ name, category, reason, clashesWith }) => ({ name, category, reason, clashesWith }));
+  return [...user, ...found];
 }
 
 function collectNotes(styles: Style[]): string[] {
@@ -246,9 +256,17 @@ export function analyze(terms: string[], opts: AnalyzeOptions = {}): Brief {
     maxSuggestions: opts.maxSuggestions ?? 8,
     maxExcludes: opts.maxExcludes ?? 6,
     targetChars: Math.min(opts.targetChars ?? STYLE_TARGET_CHARS, STYLE_MAX_CHARS),
+    exclude: opts.exclude ?? [],
   };
 
-  const { resolved, unresolved, names } = resolveAll(terms);
+  // An explicit exclude wins over the same style in `terms`.
+  const excluded = resolveAll(options.exclude);
+  const userExcludes = excluded.names;
+  const avoid = new Set(userExcludes);
+  const included = resolveAll(terms);
+  const resolved = included.resolved;
+  const unresolved = [...included.unresolved, ...excluded.unresolved];
+  const names = included.names.filter((n) => !avoid.has(n));
   const styles = names.map((n) => getStyle(n)!);
 
   // every pair once
@@ -331,8 +349,8 @@ export function analyze(terms: string[], opts: AnalyzeOptions = {}): Brief {
     ),
     clashes,
     conflicts: findConflicts(names),
-    suggestions: suggest(names, roles, options),
-    exclude: excludeList(names, roles, options),
+    suggestions: suggest(names, roles, options, avoid),
+    exclude: excludeList(names, roles, options, userExcludes),
     notes: collectNotes(styles),
     budget: { targetChars: options.targetChars, maxChars: STYLE_MAX_CHARS },
     confidence: {

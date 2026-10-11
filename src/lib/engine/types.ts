@@ -84,7 +84,9 @@ export interface Suggestion {
 export interface ExcludeItem {
   name: string;
   category: StyleCategory;
-  /** Selected styles it clashes with. */
+  /** "user": the person asked for it ("no drums"). "clash": the engine found it fights the selection. */
+  reason: "user" | "clash";
+  /** Selected styles it clashes with. Empty for user excludes. */
   clashesWith: string[];
 }
 
@@ -114,6 +116,13 @@ export interface AnalyzeOptions {
   /** "launch" limits suggestions and excludes to the approved launch set (free tier). */
   library?: "launch" | "full";
   maxSuggestions?: number;
+  /** Caps engine-found (clash) excludes; user excludes are always kept and come first. */
   maxExcludes?: number;
+  /**
+   * Styles the person explicitly doesn't want ("no drums", or a chip dragged to
+   * exclude). They go first in the exclude list, are never suggested, and win
+   * over the same style in `terms`.
+   */
+  exclude?: string[];
   targetChars?: number;
 }
