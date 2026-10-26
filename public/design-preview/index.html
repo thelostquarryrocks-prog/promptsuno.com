@@ -1,0 +1,1461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PromptSuno — Prompt like a producer</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050304}
+a{color:rgba(255,255,255,.78)}a:hover{color:#fff}
+.ps *{box-sizing:border-box}
+.ps button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.ps input,.ps select{font:inherit}
+.ps-waves{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.ps-vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(42% 48% at 50% 40%,rgba(5,3,4,.78),rgba(5,3,4,.15) 75%,transparent)}
+.sp{transition:transform .38s cubic-bezier(.34,1.56,.64,1),background-color .2s,border-color .2s,box-shadow .25s,color .2s}
+.sp:hover{transform:scale(1.03)}.sp:active{transform:scale(.97);transition-duration:.12s}
+.ps :focus-visible{outline:2px solid rgba(255,122,61,.8);outline-offset:3px}
+.navlink{position:relative;display:block;padding:10px 20px;border-radius:999px;font-size:15px;color:rgba(255,255,255,.75);text-decoration:none;border:1px solid transparent;transition:color .2s,background-color .3s,border-color .3s}
+.navlink:hover{color:#fff}
+.navlink::after{content:"";position:absolute;left:20px;right:20px;bottom:3px;height:3px;border-radius:3px;background:linear-gradient(90deg,#ffb03a,#ff6a3d 55%,#ff3b8d);box-shadow:0 0 10px rgba(255,90,60,.55);transform:scaleX(0);transform-origin:center;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.navlink:hover::after,.navlink:focus-visible::after{transform:scaleX(1)}
+.btn-out{height:44px;min-width:150px;padding:0 32px;border-radius:999px;border:1px solid rgba(255,255,255,.3)!important;font-size:15px;font-weight:500}
+.btn-out:hover{border-color:rgba(255,255,255,.55)!important;background:rgba(255,255,255,.04)!important}
+.btn-ghost{height:44px;padding:0 20px;border-radius:999px;font-size:15px;color:rgba(255,255,255,.88)}
+.btn-ghost:hover{background:rgba(255,255,255,.06)!important}
+.menu-btn{display:none;width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.12)!important;background:rgba(255,255,255,.04)!important;align-items:center;justify-content:center}
+.nav-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:4px;list-style:none;margin:0;padding:0}
+.sheet{position:absolute;left:16px;right:16px;top:76px;z-index:40;border-radius:24px;border:1px solid rgba(255,255,255,.1);background:rgba(13,7,9,.92);backdrop-filter:blur(20px);padding:12px;animation:popIn .35s cubic-bezier(.34,1.56,.64,1) both}
+.sheet a{display:block;padding:14px 16px;border-radius:16px;font-size:16px;text-decoration:none}
+.sheet a:hover{background:rgba(255,255,255,.06)}
+.rise{animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+.d1{animation-delay:.1s}.d2{animation-delay:.22s}.d3{animation-delay:.34s}.d4{animation-delay:.46s}.d5{animation-delay:.9s}
+@keyframes rise{from{opacity:0;transform:translateY(28px);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes popIn{from{opacity:0;transform:translateY(-10px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes popOut{to{opacity:0;transform:translateY(-6px) scale(.98);filter:blur(4px)}}
+@keyframes tagIn{from{opacity:0;transform:scale(.6) translateY(6px)}to{opacity:1;transform:none}}
+@keyframes tagOut{to{opacity:0;transform:scale(.6);max-width:0;margin-right:-8px;padding-left:0;padding-right:0}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}
+@keyframes shimmer{from{transform:translateX(-100%)}to{transform:translateX(300%)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+@keyframes eq{0%,100%{height:30%}25%{height:100%}50%{height:45%}75%{height:80%}}
+.grad-text{background:linear-gradient(90deg,#ffb23d 0%,#ff8a2a 30%,#ff5b3a 58%,#ff2f8e 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bar-wrap{position:relative}
+.bar-wrap.shake{animation:shake .45s ease}
+.bar-glow{position:absolute;inset:-4px;border-radius:44px;opacity:.7;filter:blur(18px);background:linear-gradient(90deg,#ff8a1f,#b23ad0 50%,#ff2f8e);pointer-events:none}
+.bar-border{position:relative;border-radius:40px;padding:1.5px;background:linear-gradient(90deg,#ffae4a,#ff6a3d 30%,#a43bd1 55%,#ff3d8e 80%,#ff7aa8)}
+.bar-inner{border-radius:39px;background:rgba(11,6,8,.86);backdrop-filter:blur(24px);padding:12px}
+.bar-row{display:flex;align-items:center;gap:12px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);padding:8px 8px 8px 16px}
+.idea{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#fff;font-size:17px}
+.idea::placeholder{color:rgba(255,255,255,.55)}
+.star-btn{width:40px;height:40px;border-radius:999px;display:grid;place-items:center;flex-shrink:0;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.star-btn:hover{transform:scale(1.15) rotate(20deg)}.star-btn:active{transform:scale(.85) rotate(90deg)}
+.icon-btn{width:40px;height:40px;border-radius:999px;display:grid;place-items:center;flex-shrink:0;color:rgba(255,255,255,.75)}
+.icon-btn:hover{color:#fff}
+.icon-btn svg{transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.icon-btn.on{background:rgba(255,255,255,.1)!important;color:#fff}.icon-btn.on svg{transform:rotate(90deg)}
+.divider{width:1px;height:32px;background:rgba(255,255,255,.15);flex-shrink:0}
+.create{height:52px;min-width:146px;padding:0 28px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0;font-size:17px;font-weight:700;color:#1d0a06!important;background:linear-gradient(90deg,#ffb03a 0%,#ff6a3d 55%,#ff3b8d 100%)!important;box-shadow:0 8px 30px -6px rgba(255,90,60,.65)}
+.create:hover{box-shadow:0 10px 38px -4px rgba(255,90,60,.85)}
+.create.nav-cta{height:44px;min-width:150px;padding:0 28px;font-size:15px}
+.eq{display:flex;align-items:flex-end;gap:3px;height:16px}.eq span{width:3px;border-radius:9px;background:currentColor;animation:eq .9s ease-in-out infinite}
+.eq span:nth-child(2){animation-delay:.12s}.eq span:nth-child(3){animation-delay:.24s}.eq span:nth-child(4){animation-delay:.36s}
+.tags{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 8px 4px;margin:0;list-style:none;text-align:left;animation:popIn .3s ease both}
+.tag{display:flex;align-items:center;gap:6px;padding:4px 4px 4px 10px;border-radius:999px;font-size:13px;border:1px solid color-mix(in srgb,var(--a) 45%,transparent);background:color-mix(in srgb,var(--a) 13%,transparent);white-space:nowrap;overflow:hidden;max-width:240px;animation:tagIn .42s cubic-bezier(.34,1.56,.64,1) both}
+.tag.out{animation:tagOut .2s ease forwards}
+.tag::before{content:"";width:7px;height:7px;border-radius:9px;background:var(--a);box-shadow:0 0 8px var(--a)}
+.tag-x{width:24px;height:24px;border-radius:999px;display:grid;place-items:center;color:rgba(255,255,255,.6)}
+.tag-x:hover{background:rgba(255,255,255,.1)!important;color:#fff}
+.link-btn{font-size:13px;color:rgba(255,255,255,.55);padding:6px 10px;border-radius:999px}
+.link-btn:hover{color:#fff;text-decoration:underline;text-underline-offset:4px}
+.adv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;padding:16px 16px 12px;text-align:left;animation:popIn .35s ease both}
+.field{display:flex;flex-direction:column;gap:8px}
+.field-top{display:flex;justify-content:space-between;font-size:13px;color:rgba(255,255,255,.7)}
+.field-top b{color:#fff;font-weight:500;font-variant-numeric:tabular-nums}
+.range{width:100%;accent-color:#ff5f5a;cursor:pointer}
+.sel{height:40px;width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#140a0d;color:#fff;padding:0 12px;font-size:14px}
+.excl{grid-column:1 / -1}
+.excl-box{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);padding:6px 8px}
+.excl-chip{display:flex;align-items:center;gap:4px;padding:2px 2px 2px 10px;border-radius:999px;background:rgba(255,255,255,.1);font-size:12px;animation:tagIn .35s cubic-bezier(.34,1.56,.64,1) both}
+.excl-in{flex:1;min-width:120px;height:28px;background:transparent;border:0;outline:0;color:#fff;font-size:14px;padding:0 4px}
+.excl-in::placeholder{color:rgba(255,255,255,.4)}
+.err{margin:12px 0 0;text-align:center;font-size:14px;color:#ffb08a;animation:popIn .25s ease both}
+.chips{display:flex;justify-content:center;gap:14px;margin:36px 0 0;padding:0;list-style:none}
+.chip{position:relative;height:52px;min-width:128px;padding:0 24px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:16px;color:#fff;border:1px solid color-mix(in srgb,var(--a) 60%,transparent)!important;background:color-mix(in srgb,var(--a) 17%,rgba(10,5,6,.5))!important;white-space:nowrap}
+.chip svg{color:color-mix(in srgb,var(--a) 65%,#fff)}
+.chip:hover{background:color-mix(in srgb,var(--a) 26%,rgba(10,5,6,.5))!important;border-color:var(--a)!important}
+.chip.active{border-color:var(--a)!important;box-shadow:0 0 24px -4px color-mix(in srgb,var(--a) 70%,transparent),inset 0 0 18px -8px var(--a);background:radial-gradient(120% 140% at 50% 0%,color-mix(in srgb,var(--a) 42%,transparent),color-mix(in srgb,var(--a) 22%,rgba(10,5,6,.5)) 75%)!important}
+.count{min-width:20px;height:20px;padding:0 6px;border-radius:999px;display:grid;place-items:center;font-size:11px;font-weight:800;color:#1d0a06;background:var(--a);animation:tagIn .4s cubic-bezier(.34,1.56,.64,1) both}
+.c-genre{--a:#a65cff}.c-mood{--a:#4d8dff}.c-instruments{--a:#ff8a2a}.c-vocals{--a:#ff4f9a}.c-production{--a:#2fd4c2}
+.panel{position:relative;z-index:5;margin-top:16px;border-radius:24px;border:1px solid rgba(255,255,255,.1);background:rgba(13,7,9,.82);backdrop-filter:blur(24px);padding:20px;text-align:left;animation:popIn .4s cubic-bezier(.34,1.4,.64,1) both}
+.panel.out{animation:popOut .14s ease forwards}
+.panel-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px}
+.hint{margin:0;font-size:13px;line-height:1.6;color:rgba(255,255,255,.65)}
+.hint.nudge{color:#ffb08a;animation:shake .4s ease}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.opts li{animation:popIn .35s ease both}
+.opts li:nth-child(2){animation-delay:.025s}.opts li:nth-child(3){animation-delay:.05s}.opts li:nth-child(4){animation-delay:.075s}.opts li:nth-child(5){animation-delay:.1s}.opts li:nth-child(6){animation-delay:.125s}.opts li:nth-child(7){animation-delay:.15s}.opts li:nth-child(8){animation-delay:.175s}.opts li:nth-child(9){animation-delay:.2s}.opts li:nth-child(10){animation-delay:.225s}
+.opt{height:40px;padding:0 16px;border-radius:999px;display:flex;align-items:center;gap:6px;font-size:14px;color:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.12)!important;background:rgba(255,255,255,.03)!important}
+.opt:hover{color:#fff;border-color:rgba(255,255,255,.28)!important}
+.opt.on{color:#fff;border-color:var(--a)!important;background:color-mix(in srgb,var(--a) 17%,transparent)!important}
+.opt svg{color:var(--a);animation:tagIn .35s cubic-bezier(.34,1.56,.64,1) both}
+.card{margin-top:20px;border-radius:24px;border:1px solid rgba(255,255,255,.1);background:rgba(13,7,9,.82);backdrop-filter:blur(24px);padding:24px;text-align:left;animation:popIn .45s cubic-bezier(.34,1.3,.64,1) both}
+.skel{position:relative;height:12px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:10px}
+.skel::after{content:"";position:absolute;inset:0;width:33%;background:linear-gradient(90deg,transparent,rgba(255,140,80,.5),transparent);animation:shimmer 1.1s ease-in-out infinite}
+.mini{height:36px;padding:0 16px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500}
+.mini.glass{border:1px solid rgba(255,255,255,.1)!important;background:rgba(255,255,255,.04)!important}
+.mini.glass:hover{background:rgba(255,255,255,.08)!important}
+.mini.primary{font-weight:700;color:#1d0a06!important;background:linear-gradient(90deg,#ffb03a 0%,#ff6a3d 55%,#ff3b8d 100%)!important;min-width:104px;justify-content:center}
+.style-box{border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.4);padding:16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;line-height:1.6;color:#ffd3b8;margin:0}
+.bob{animation:bob 1.8s ease-in-out infinite}
+.stream{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.st{position:absolute;left:0;top:0;pointer-events:auto;display:flex;align-items:center;gap:9px;padding:10px 18px 10px 14px;border-radius:999px;font-size:17px;font-weight:500;white-space:nowrap;color:#fff;cursor:grab;touch-action:manipulation;user-select:none;-webkit-user-select:none;opacity:0;will-change:transform,opacity;border:1.5px solid color-mix(in srgb,var(--a) 75%,transparent)!important;background:color-mix(in srgb,var(--a) 14%,rgba(14,6,6,.72))!important;box-shadow:0 0 18px -4px color-mix(in srgb,var(--a) 70%,transparent),inset 0 0 12px -6px var(--a);transition:box-shadow .2s,border-color .2s}
+.st::before{content:"";width:8px;height:8px;border-radius:9px;background:var(--a);box-shadow:0 0 8px var(--a)}
+.st:hover{border-color:var(--a)!important;box-shadow:0 0 30px 0 color-mix(in srgb,var(--a) 80%,transparent),inset 0 0 14px -4px var(--a)}
+.st:active{cursor:grabbing}
+.hero-content{pointer-events:none}
+.hero-content .builder{pointer-events:auto}
+.strip{pointer-events:none}.strip button{pointer-events:auto}
+.bar-border{transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.bar-wrap.drop-ready .bar-glow{animation:glowPulse 1.1s ease-in-out infinite}
+.bar-wrap.drop-hot .bar-border{transform:scale(1.025)}
+.bar-wrap.drop-hot .bar-glow{opacity:1;filter:blur(28px)}
+@keyframes glowPulse{0%,100%{opacity:.7;filter:blur(18px)}50%{opacity:1;filter:blur(26px)}}
+.drag-hint{margin:18px 0 0;font-size:13px;color:rgba(255,255,255,.58);animation:popIn .5s ease both}
+.drag-hint .t{display:none}
+@media (hover:none){.drag-hint .m{display:none}.drag-hint .t{display:inline}}
+.strip-left{display:flex;align-items:center;min-height:44px}
+.strip-ctl{display:inline-flex;align-items:center;gap:12px;min-height:44px;padding:0 6px 0 0;color:rgba(255,255,255,.7);transition:color .2s}
+.strip-ctl:hover{color:#fff}
+.strip-ico{position:relative;width:30px;height:30px;border-radius:999px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.28);transition:border-color .25s,background-color .25s,transform .38s cubic-bezier(.34,1.56,.64,1)}
+.strip-ctl:hover .strip-ico{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.06);transform:scale(1.08)}
+.strip-ctl[aria-pressed="false"] .strip-ico::after{content:"";position:absolute;inset:-4px;border-radius:999px;border:1px solid rgba(255,140,80,.35);animation:ringPulse 2.4s ease-out infinite}
+@keyframes ringPulse{0%{opacity:.9;transform:scale(.9)}100%{opacity:0;transform:scale(1.35)}}
+.strip-lbl{font-size:10px;letter-spacing:.34em;text-transform:uppercase}
+.pause-btn{position:absolute;right:clamp(16px,4vw,56px);bottom:120px;z-index:20;height:36px;padding:0 14px;border-radius:999px;display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.14)!important;background:rgba(10,5,6,.55)!important}
+.pause-btn:hover{color:#fff;border-color:rgba(255,255,255,.3)!important}
+.scroll-cue{color:rgba(255,255,255,.7)}.scroll-cue:hover{color:#fff}
+.scroll-cue:hover .bob{animation-duration:.9s}
+.hero-content{opacity:calc(1 - var(--p,0) * 1.15);transform:translateY(calc(var(--p,0) * -80px)) scale(calc(1 - var(--p,0) * .07))}
+.wrap{max-width:1224px;margin:0 auto;padding-left:20px;padding-right:20px}
+.explore{position:relative;padding:72px 0 24px;overflow:hidden}
+.explore::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(28% 40% at 0% 28%,rgba(255,120,20,.22),transparent 70%),radial-gradient(28% 40% at 100% 28%,rgba(255,30,140,.22),transparent 70%)}
+.explore .wrap{position:relative}
+.eyebrow{margin:0 0 10px;font-size:11px;letter-spacing:.32em;color:rgba(255,255,255,.62)}
+.h2{margin:0;font-size:clamp(2rem,3.4vw,3.1rem);font-weight:800;letter-spacing:-.035em;line-height:1.08}
+.lede{margin:10px 0 0;font-size:17px;line-height:1.55;color:rgba(255,255,255,.75)}
+.rv{transition:opacity .9s ease,transform 1s cubic-bezier(.2,.8,.2,1),filter .9s ease}
+.rv.pre{opacity:0;transform:translateY(40px);filter:blur(8px)}
+.stg>.rv-item{transition:opacity .8s ease,transform 1s cubic-bezier(.2,.8,.2,1),filter .8s ease}
+.stg.pre>.rv-item{opacity:0;transform:translateY(56px) scale(.96);filter:blur(6px)}
+.stg>.rv-item:nth-child(2){transition-delay:.13s}.stg>.rv-item:nth-child(3){transition-delay:.26s}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:30px}
+.rv-item{display:flex}
+.xcard{position:relative;flex:1;overflow:hidden;min-height:300px;border-radius:20px;border:1px solid color-mix(in srgb,var(--a) 60%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--a) 9%,#0b0608),#0a0507 65%);box-shadow:0 0 44px -20px var(--a),inset 0 0 30px -22px var(--a);transition:transform .5s cubic-bezier(.34,1.56,.64,1),box-shadow .35s ease,border-color .35s}
+.xcard:hover{transform:translateY(-6px);border-color:var(--a);box-shadow:0 24px 60px -24px var(--a),inset 0 0 40px -20px var(--a)}
+.xcard-art{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.xcard-body{position:relative;height:100%;padding:28px;display:flex;flex-direction:column;align-items:flex-start}
+.xicon{width:54px;height:54px;border-radius:14px;display:grid;place-items:center;color:color-mix(in srgb,var(--a) 35%,#fff);border:1px solid color-mix(in srgb,var(--a) 65%,transparent);background:color-mix(in srgb,var(--a) 16%,transparent);box-shadow:0 0 22px -6px var(--a)}
+.xtitle{margin:22px 0 0;font-size:26px;font-weight:800;letter-spacing:-.01em}
+.xsub{margin:2px 0 0;font-size:18px;color:rgba(255,255,255,.9)}
+.xdesc{margin:14px 0 22px;max-width:340px;font-size:14.5px;line-height:1.65;color:rgba(255,255,255,.74)}
+.xbtn{margin-top:auto;display:inline-flex;align-items:center;gap:14px;height:44px;padding:0 24px;border-radius:999px;border:1px solid var(--a);background:rgba(0,0,0,.3);color:#fff;text-decoration:none;font-size:15px;font-weight:500;transition:background-color .25s,transform .38s cubic-bezier(.34,1.56,.64,1)}
+.xbtn:hover{color:#fff;background:color-mix(in srgb,var(--a) 18%,rgba(0,0,0,.3));transform:scale(1.03)}.xbtn:active{transform:scale(.97)}
+.xbtn svg,.faq-more svg{transition:transform .38s cubic-bezier(.34,1.56,.64,1)}
+.xcard:hover .xbtn svg,.faq-more:hover svg{transform:translateX(5px)}
+.c-learn{--a:#ff9a2e}.c-build{--a:#ff3d6e}.c-write{--a:#b54cff}
+.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(40px,5vw,72px);padding-top:80px;padding-bottom:64px;text-align:left}
+.plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:30px}
+.plan{position:relative;flex:1;display:flex;flex-direction:column;padding:28px;border-radius:20px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.025);transition:transform .5s cubic-bezier(.34,1.56,.64,1),box-shadow .35s}
+.plan:hover{transform:translateY(-5px);box-shadow:0 24px 50px -28px rgba(255,255,255,.25)}
+.plan.pro{border:1.5px solid transparent;background:linear-gradient(#0d0608,#0d0608) padding-box,linear-gradient(135deg,#ffb03a,#ff4d6d 50%,#ff2f8e) border-box;box-shadow:0 0 50px -14px rgba(255,80,90,.55)}
+.plan.pro:hover{box-shadow:0 0 70px -10px rgba(255,80,90,.75)}
+.badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);height:26px;padding:0 18px;border-radius:999px;display:grid;place-items:center;white-space:nowrap;font-size:10.5px;font-weight:800;letter-spacing:.2em;color:#1d0a06;background:linear-gradient(90deg,#ffb03a,#ff6a3d 55%,#ff3b8d)}
+.plan-name{margin:0;font-size:26px;font-weight:800;letter-spacing:-.02em}
+.plan-tag{margin:4px 0 0;font-size:15px;color:rgba(255,255,255,.65)}
+.price{display:flex;align-items:baseline;gap:8px;margin:22px 0 20px}
+.amt{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1}.amt sup{font-size:.55em;vertical-align:.55em;margin-right:1px}
+.per{font-size:15px;color:rgba(255,255,255,.65)}
+.feats{list-style:none;margin:0 0 28px;padding:0;display:flex;flex-direction:column;gap:11px;font-size:15px;color:rgba(255,255,255,.86)}
+.feats li{display:flex;align-items:center;gap:12px}.feats svg{flex-shrink:0;color:rgba(255,255,255,.75)}
+.pro .feats svg{color:#ff9a6a}
+.plan-btn{margin-top:auto;width:100%;height:48px;border-radius:999px;border:1px solid rgba(255,255,255,.32)!important;font-size:16px;font-weight:500}
+.plan-btn:hover{background:rgba(255,255,255,.05)!important}
+.pro-btn{border:0!important;color:#1d0a06!important;font-weight:600;background:linear-gradient(90deg,#ffb03a 0%,#ff6a3d 55%,#ff2f8e 100%)!important;box-shadow:0 10px 30px -8px rgba(255,80,90,.7)}
+.faq-list{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.faq-item{border-radius:14px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.025);transition:border-color .3s,background-color .3s}
+.faq-item:hover{border-color:rgba(255,255,255,.24)}
+.faq-item.open{border-color:rgba(255,120,80,.5);background:rgba(255,110,70,.05)}
+.faq-q{width:100%;min-height:54px;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left;font-size:16px;color:#fff}
+.chev{flex-shrink:0;transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+.open .chev{transform:rotate(180deg)}
+.faq-a{padding:0 22px 18px;overflow:hidden;animation:faqIn .4s cubic-bezier(.2,.8,.2,1) both}
+.faq-a p{margin:0;font-size:14.5px;line-height:1.65;color:rgba(255,255,255,.74)}
+@keyframes faqIn{from{opacity:0;max-height:0;transform:translateY(-6px)}to{opacity:1;max-height:240px;transform:none}}
+.faq-more{display:inline-flex;align-items:center;gap:14px;margin-top:24px;height:50px;padding:0 28px;border-radius:999px;border:1.5px solid transparent;background:linear-gradient(#050304,#050304) padding-box,linear-gradient(90deg,#ff8a3a,#ff2f8e) border-box;color:#fff;text-decoration:none;font-size:16px;transition:transform .38s cubic-bezier(.34,1.56,.64,1)}
+.faq-more:hover{color:#fff;transform:scale(1.03)}.faq-more:active{transform:scale(.97)}
+.foot{border-top:1px solid rgba(255,255,255,.1);max-width:1900px;margin:0 auto}
+.foot-in{max-width:1440px;margin:0 auto;padding:30px clamp(20px,3.4vw,48px) 38px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px}
+.foot-links{display:flex;flex-wrap:wrap;gap:8px 28px}
+.h2.sm{font-size:clamp(1.75rem,2.6vw,2.4rem)}
+@media (max-width:1279px){.foot-tag{display:none}}
+.foot-links a,.socials a,.legal a{font-size:14px;text-decoration:none;color:rgba(255,255,255,.8);transition:color .2s}
+.foot-links a:hover,.socials a:hover,.legal a:hover{color:#fff}
+.socials{display:flex;gap:16px}
+.socials a{font-size:13px;padding:6px 0;border-bottom:1px solid transparent}.socials a:hover{border-bottom-color:rgba(255,255,255,.5)}
+.legal{display:flex;gap:22px}.legal a{font-size:13px}
+.foot-div{width:1px;height:34px;background:rgba(255,255,255,.18)}
+@media (max-width:1023px){
+.cards,.duo{grid-template-columns:1fr}
+.xcard{min-height:260px}
+}
+@media (max-width:639px){
+.plans{grid-template-columns:1fr;row-gap:34px}
+.foot-div{display:none}
+}
+@media (max-width:767px){
+.nav-center,.nav-actions{display:none!important}
+.menu-btn{display:inline-flex}
+.bar-row{gap:8px;padding-left:10px}
+.idea{font-size:15px}
+.divider{display:none}
+.create{min-width:0;width:52px;padding:0}
+.create-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.chips{justify-content:flex-start;overflow-x:auto;margin-left:-20px;margin-right:-20px;padding:0 20px 4px;scrollbar-width:none}
+.chip{min-width:0;flex-shrink:0}
+.adv{grid-template-columns:1fr}
+.tagline{display:none!important}
+.scroll-cue{display:none!important}
+}
+@media (prefers-reduced-motion:reduce){.ps *{animation-duration:.001s!important;transition-duration:.001s!important}}
+</style>
+</helmet>
+<div class="ps" ref="{{setRoot}}" style="position: relative; background: #050304; color: #ffffff; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+<div class="hero" ref="{{setHero}}" style="position: relative; min-height: min(100vh, 1000px); display: flex; flex-direction: column; overflow: hidden">
+<canvas ref="{{setCanvas}}" class="ps-waves" aria-hidden="true"></canvas>
+<div class="ps-vignette" aria-hidden="true"></div>
+<sc-if value="{{streamOn}}" hint-placeholder-val="{{ true }}">
+<div class="stream" ref="{{setLayer}}" aria-hidden="true">
+<sc-for list="{{stream}}" as="st" hint-placeholder-count="6">
+<button type="button" tabindex="-1" class="{{st.cls}}" ref="{{st.ref}}" onPointerDown="{{st.down}}" onPointerEnter="{{st.enter}}" onPointerLeave="{{st.leave}}">{{st.label}}</button>
+</sc-for>
+</div>
+</sc-if>
+<div aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: 12rem; background: linear-gradient(to top, #050304, transparent); pointer-events: none"></div>
+
+<header style="position: relative; z-index: 30">
+<nav aria-label="Main" style="position: relative; max-width: 1440px; margin: 0 auto; height: 96px; padding: 0 clamp(20px, 5.4vw, 78px); display: flex; align-items: center; justify-content: space-between">
+<a href="#" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #ffffff">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 252 792 280" width="79" height="28" aria-hidden="true" style="display: block; flex-shrink: 0"><defs><linearGradient id="ln-base" gradientUnits="userSpaceOnUse" x1="130" y1="0" x2="720" y2="0"><stop offset="0" stop-color="#d43a10"></stop><stop offset=".2" stop-color="#b3150b"></stop><stop offset=".4" stop-color="#7e0118"></stop><stop offset=".55" stop-color="#6a0030"></stop><stop offset=".8" stop-color="#b0034a"></stop><stop offset="1" stop-color="#cc0a55"></stop></linearGradient><linearGradient id="ln-top" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="606" y2="0"><stop offset="0" stop-color="#fdb41f"></stop><stop offset=".25" stop-color="#fd9e22"></stop><stop offset=".55" stop-color="#fb8a2c"></stop><stop offset=".8" stop-color="#f8622e"></stop><stop offset="1" stop-color="#f04a35"></stop></linearGradient><linearGradient id="ln-band" gradientUnits="userSpaceOnUse" x1="150" y1="0" x2="604" y2="0"><stop offset="0" stop-color="#fdb52a"></stop><stop offset=".45" stop-color="#fec43c"></stop><stop offset=".78" stop-color="#fca735"></stop><stop offset="1" stop-color="#f98e30"></stop></linearGradient><radialGradient id="ln-topred" gradientUnits="userSpaceOnUse" cx="420" cy="400" r="170"><stop offset="0" stop-color="#ee3232" stop-opacity=".55"></stop><stop offset=".55" stop-color="#f04a32" stop-opacity=".2"></stop><stop offset="1" stop-color="#f04a32" stop-opacity="0"></stop></radialGradient><linearGradient id="ln-tophi" gradientUnits="userSpaceOnUse" x1="0" y1="258" x2="0" y2="318"><stop offset="0" stop-color="#ffcb3c" stop-opacity=".95"></stop><stop offset="1" stop-color="#ffcb3c" stop-opacity="0"></stop></linearGradient><linearGradient id="ln-front" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="366" y2="0"><stop offset="0" stop-color="#fdba2c"></stop><stop offset=".32" stop-color="#fd9a33"></stop><stop offset=".6" stop-color="#fe6044"></stop><stop offset=".88" stop-color="#fd3a52"></stop><stop offset="1" stop-color="#fc2c5e"></stop></linearGradient><linearGradient id="ln-lens" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="320" y2="0"><stop offset="0" stop-color="#ffc94a" stop-opacity=".7"></stop><stop offset="1" stop-color="#ffb04a" stop-opacity="0"></stop></linearGradient><linearGradient id="ln-up" gradientUnits="userSpaceOnUse" x1="600" y1="0" x2="799" y2="0"><stop offset="0" stop-color="#b8063f"></stop><stop offset=".25" stop-color="#d70f52"></stop><stop offset=".6" stop-color="#f21657"></stop><stop offset="1" stop-color="#fc1a5a"></stop></linearGradient><radialGradient id="ln-upshade" gradientUnits="userSpaceOnUse" cx="606" cy="392" r="34"><stop offset="0" stop-color="#5a0020" stop-opacity=".35"></stop><stop offset="1" stop-color="#5a0020" stop-opacity="0"></stop></radialGradient><linearGradient id="ln-low" gradientUnits="userSpaceOnUse" x1="370" y1="0" x2="799" y2="0"><stop offset="0" stop-color="#5e0028"></stop><stop offset=".18" stop-color="#a8034a"></stop><stop offset=".35" stop-color="#d80c5e"></stop><stop offset=".54" stop-color="#f42273"></stop><stop offset=".77" stop-color="#fd4b88"></stop><stop offset="1" stop-color="#fb2f70"></stop></linearGradient><linearGradient id="ln-lowrim" gradientUnits="userSpaceOnUse" x1="0" y1="470" x2="0" y2="527"><stop offset="0" stop-color="#b8003c" stop-opacity="0"></stop><stop offset="1" stop-color="#b8003c" stop-opacity=".75"></stop></linearGradient></defs><path d="M19,488 C20,486 19,485 25,478 C31,471 44,456 53,446 C62,436 72,427 81,418 C90,409 100,399 109,390 C118,381 128,371 137,362 C146,353 156,344 165,336 C174,328 184,320 193,313 C202,306 212,300 221,294 C230,288 240,284 249,280 C258,276 268,273 277,270 C286,267 296,265 305,263 C314,261 324,260 333,259 C342,258 352,258 361,259 C370,260 380,260 389,262 C398,264 408,266 417,268 C426,270 436,273 445,277 C454,281 464,286 473,291 C482,296 492,302 501,308 C510,314 520,321 529,328 C538,335 548,344 557,351 C566,358 576,367 585,372 C594,377 604,382 613,381 C622,380 632,368 641,363 C650,358 660,355 669,352 C678,349 688,346 697,345 C706,344 716,344 725,344 C734,344 744,345 753,347 C762,349 773,352 781,356 C789,360 796,367 799,369 C796,373 789,384 781,394 C773,404 762,417 753,427 C744,437 734,446 725,455 C716,464 706,472 697,479 C688,486 678,493 669,498 C660,503 650,507 641,511 C632,515 622,518 613,520 C604,522 594,524 585,525 C576,526 566,526 557,526 C548,526 538,525 529,523 C520,521 510,518 501,515 C492,512 482,508 473,503 C464,498 454,492 445,486 C436,480 430,475 417,466 C404,457 379,434 365,431 C351,428 343,443 333,449 C323,455 314,463 305,469 C296,475 286,482 277,487 C268,492 258,498 249,502 C240,506 230,510 221,513 C212,516 202,518 193,520 C184,522 174,523 165,524 C156,525 146,524 137,524 C128,524 118,522 109,521 C100,520 90,518 81,515 C72,512 62,509 53,505 C44,501 31,495 25,492 C19,489 20,489 19,488 Z" fill="url(#ln-base)"></path><path d="M19,488 C20,486 19,485 25,478 C31,471 44,456 53,446 C62,436 72,427 81,418 C90,409 100,399 109,390 C118,381 128,371 137,362 C146,353 156,344 165,336 C174,328 184,320 193,313 C202,306 212,300 221,294 C230,288 240,284 249,280 C258,276 268,273 277,270 C286,267 296,265 305,263 C314,261 324,260 333,259 C342,258 352,258 361,259 C370,260 380,260 389,262 C398,264 408,266 417,268 C426,270 436,273 445,277 C454,281 464,286 473,291 C482,296 492,302 501,308 C510,314 520,321 529,328 C538,335 548,344 557,351 C566,358 577,367 585,372 C593,377 602,381 606,383 C606,384 610,386 606,388 C602,390 592,395 585,396 C578,397 571,393 565,392 C559,391 555,390 550,389 C545,388 542,388 535,387 C528,386 515,386 505,386 C495,386 485,387 475,388 C465,389 455,391 445,393 C435,395 425,398 415,402 C405,406 393,410 385,415 C377,420 369,428 366,430 C364,427 358,418 352,412 C346,406 339,400 330,394 C321,388 310,381 300,376 C290,371 280,367 270,364 C260,361 250,358 240,356 C230,354 220,353 210,354 C200,355 190,357 180,360 C170,363 160,367 150,373 C140,379 128,387 120,394 C112,401 110,404 100,414 C90,424 74,440 60,452 C46,464 26,482 19,488 Z" fill="url(#ln-top)"></path><path d="M19,488 C20,486 19,485 25,478 C31,471 44,456 53,446 C62,436 72,427 81,418 C90,409 100,399 109,390 C118,381 128,371 137,362 C146,353 156,344 165,336 C174,328 184,320 193,313 C202,306 212,300 221,294 C230,288 240,284 249,280 C258,276 268,273 277,270 C286,267 296,265 305,263 C314,261 324,260 333,259 C342,258 352,258 361,259 C370,260 380,260 389,262 C398,264 408,266 417,268 C426,270 436,273 445,277 C454,281 464,286 473,291 C482,296 492,302 501,308 C510,314 520,321 529,328 C538,335 548,344 557,351 C566,358 577,367 585,372 C593,377 602,381 606,383 C606,384 610,386 606,388 C602,390 592,395 585,396 C578,397 571,393 565,392 C559,391 555,390 550,389 C545,388 542,388 535,387 C528,386 515,386 505,386 C495,386 485,387 475,388 C465,389 455,391 445,393 C435,395 425,398 415,402 C405,406 393,410 385,415 C377,420 369,428 366,430 C364,427 358,418 352,412 C346,406 339,400 330,394 C321,388 310,381 300,376 C290,371 280,367 270,364 C260,361 250,358 240,356 C230,354 220,353 210,354 C200,355 190,357 180,360 C170,363 160,367 150,373 C140,379 128,387 120,394 C112,401 110,404 100,414 C90,424 74,440 60,452 C46,464 26,482 19,488 Z" fill="url(#ln-topred)"></path><path d="M165,336 C170,332 184,320 193,313 C202,306 212,300 221,294 C230,288 240,284 249,280 C258,276 268,273 277,270 C286,267 296,265 305,263 C314,261 324,260 333,259 C342,258 352,258 361,259 C370,260 380,260 389,262 C398,264 408,266 417,268 C426,270 436,273 445,277 C454,281 464,286 473,291 C482,296 492,302 501,308 C510,314 520,321 529,328 C538,335 548,344 557,351 C566,358 577,366 585,372 C593,378 601,382 604,384 C600,384 591,390 580,386 C569,382 553,369 540,362 C527,355 515,349 500,342 C485,335 467,324 450,319 C433,314 417,312 400,309 C383,306 367,304 350,304 C333,304 317,306 300,308 C283,310 267,313 250,319 C233,325 214,336 200,342 C186,348 171,357 165,356 C159,355 165,339 165,336 Z" fill="url(#ln-band)"></path><path d="M19,488 C26,482 46,464 60,452 C74,440 88,424 100,414 C112,404 120,399 130,393 C140,387 150,381 160,376 C170,371 181,366 190,364 C199,362 207,361 215,362 C223,363 232,366 240,369 C248,372 256,376 265,379 C274,382 285,386 295,390 C305,394 316,399 325,404 C334,409 343,416 350,420 C357,424 363,428 366,430 C360,433 343,442 333,449 C323,456 314,463 305,469 C296,475 286,482 277,487 C268,492 258,498 249,502 C240,506 230,510 221,513 C212,516 202,518 193,520 C184,522 174,523 165,524 C156,525 146,524 137,524 C128,524 118,522 109,521 C100,520 90,518 81,515 C72,512 62,509 53,505 C44,501 31,495 25,492 C19,489 20,489 19,488 Z" fill="url(#ln-front)"></path><path d="M19,488 C31,487 65,482 90,480 C115,478 143,479 170,476 C197,473 225,469 250,464 C275,459 307,449 318,446 C316,450 312,462 305,469 C298,476 286,482 277,487 C268,492 258,498 249,502 C240,506 230,510 221,513 C212,516 202,518 193,520 C184,522 174,523 165,524 C156,525 146,524 137,524 C128,524 118,522 109,521 C100,520 90,518 81,515 C72,512 62,509 53,505 C44,501 31,495 25,492 C19,489 20,489 19,488 Z" fill="url(#ln-lens)"></path><path d="M598,384 C600,384 606,384 613,381 C620,378 632,368 641,363 C650,358 660,355 669,352 C678,349 688,346 697,345 C706,344 716,344 725,344 C734,344 744,345 753,347 C762,349 773,352 781,356 C789,360 796,367 799,369 C794,373 780,387 770,394 C760,401 749,407 740,411 C731,415 724,417 715,418 C706,419 695,418 685,417 C675,416 662,413 655,411 C648,409 645,408 640,407 C635,406 630,404 625,403 C620,402 614,400 610,398 C606,396 600,390 598,388 C596,386 598,385 598,384 Z" fill="url(#ln-up)"></path><path d="M598,384 C600,384 606,384 613,381 C620,378 632,368 641,363 C650,358 660,355 669,352 C678,349 688,346 697,345 C706,344 716,344 725,344 C734,344 744,345 753,347 C762,349 773,352 781,356 C789,360 796,367 799,369 C794,373 780,387 770,394 C760,401 749,407 740,411 C731,415 724,417 715,418 C706,419 695,418 685,417 C675,416 662,413 655,411 C648,409 645,408 640,407 C635,406 630,404 625,403 C620,402 614,400 610,398 C606,396 600,390 598,388 C596,386 598,385 598,384 Z" fill="url(#ln-upshade)"></path><path d="M366,430 C369,430 377,430 385,428 C393,426 405,423 415,421 C425,419 435,417 445,416 C455,415 465,414 475,413 C485,412 495,412 505,413 C515,414 525,415 535,416 C545,417 554,419 565,421 C576,423 588,426 600,428 C612,430 628,433 640,434 C652,435 660,434 670,432 C680,430 688,428 700,425 C712,422 728,417 740,412 C752,407 760,401 770,394 C780,387 794,373 799,369 C796,373 789,384 781,394 C773,404 762,417 753,427 C744,437 734,446 725,455 C716,464 706,472 697,479 C688,486 678,493 669,498 C660,503 650,507 641,511 C632,515 622,518 613,520 C604,522 594,524 585,525 C576,526 566,526 557,526 C548,526 538,525 529,523 C520,521 510,518 501,515 C492,512 482,508 473,503 C464,498 454,492 445,486 C436,480 430,475 417,466 C404,457 374,436 366,430 Z" fill="url(#ln-low)"></path><path d="M366,430 C369,430 377,430 385,428 C393,426 405,423 415,421 C425,419 435,417 445,416 C455,415 465,414 475,413 C485,412 495,412 505,413 C515,414 525,415 535,416 C545,417 554,419 565,421 C576,423 588,426 600,428 C612,430 628,433 640,434 C652,435 660,434 670,432 C680,430 688,428 700,425 C712,422 728,417 740,412 C752,407 760,401 770,394 C780,387 794,373 799,369 C796,373 789,384 781,394 C773,404 762,417 753,427 C744,437 734,446 725,455 C716,464 706,472 697,479 C688,486 678,493 669,498 C660,503 650,507 641,511 C632,515 622,518 613,520 C604,522 594,524 585,525 C576,526 566,526 557,526 C548,526 538,525 529,523 C520,521 510,518 501,515 C492,512 482,508 473,503 C464,498 454,492 445,486 C436,480 430,475 417,466 C404,457 374,436 366,430 Z" fill="url(#ln-lowrim)"></path></svg>
+<span style="font-size: 26px; font-weight: 800; letter-spacing: -0.03em">PromptSuno</span>
+</a>
+<ul class="nav-center">
+<li><a class="navlink" href="#explore" onClick="{{navExplore}}">Learn Suno</a></li>
+<li><a class="navlink" href="#build" onClick="{{navBuild}}">Build Prompts</a></li>
+<li><a class="navlink" href="#explore" onClick="{{navExplore}}">Write Lyrics</a></li>
+</ul>
+<div class="nav-actions" style="display: flex; align-items: center; gap: 12px">
+<button type="button" class="btn-ghost sp">Sign in</button>
+<button type="button" class="create nav-cta sp">Get Started</button>
+</div>
+<button type="button" class="menu-btn sp" aria-label="{{navLabel}}" aria-expanded="{{navExpanded}}" onClick="{{toggleNav}}">
+<sc-if value="{{navOpen}}" hint-placeholder-val="{{ false }}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+</sc-if>
+<sc-if value="{{navClosed}}" hint-placeholder-val="{{ true }}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+</sc-if>
+</button>
+</nav>
+<sc-if value="{{navOpen}}" hint-placeholder-val="{{ false }}">
+<div class="sheet">
+<a href="#explore" onClick="{{sheetExplore}}">Learn Suno</a>
+<a href="#build" onClick="{{toggleNav}}">Build Prompts</a>
+<a href="#explore" onClick="{{sheetExplore}}">Write Lyrics</a>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1)">
+<button type="button" class="mini glass sp" style="height: 44px; justify-content: center">Sign in</button>
+<button type="button" class="mini primary sp" style="height: 44px">Get Started</button>
+</div>
+</div>
+</sc-if>
+</header>
+
+<section id="build" class="hero-content" style="position: relative; z-index: 10; flex: 1; width: 100%; max-width: 1440px; margin: 0 auto; padding: clamp(24px, 3.6vw, 52px) 20px 40px; display: flex; flex-direction: column; align-items: center; text-align: center">
+<h1 style="margin: 0; font-weight: 800; line-height: 0.98; letter-spacing: -0.045em; font-size: clamp(2.6rem, 6.6vw, 6.1rem)">
+<span class="rise d1" style="display: block">Prompt like a producer.</span>
+<span class="rise d2 grad-text" style="display: block; padding-bottom: 8px">Built for Suno v6</span>
+</h1>
+<p class="rise d3" style="margin: 20px 0 0; max-width: 660px; font-size: clamp(1rem, 1.45vw, 1.25rem); line-height: 1.55; color: rgba(255,255,255,0.8)">Turn your ideas into original music with AI. Crafted for creators, dreamers, and anyone who hears music in everything.</p>
+
+<div class="rise d4 builder" style="width: 100%; max-width: 830px; margin-top: 48px">
+<div class="{{barCls}}" ref="{{setBar}}">
+<div class="bar-glow" aria-hidden="true"></div>
+<div class="bar-border">
+<div class="bar-inner">
+<div class="bar-row">
+<button type="button" class="star-btn" aria-label="Surprise me — fill with a random idea" title="Surprise me" onClick="{{surprise}}">
+<svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" style="filter: drop-shadow(0 0 10px rgba(255,150,40,0.6))"><defs><linearGradient id="psstar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc24a"></stop><stop offset="1" stop-color="#ff7a1f"></stop></linearGradient></defs><path d="M12 1.5c.7 5.6 4.9 9.8 10.5 10.5-5.6.7-9.8 4.9-10.5 10.5C11.3 16.9 7.1 12.7 1.5 12 7.1 11.3 11.3 7.1 12 1.5Z" fill="url(#psstar)"></path></svg>
+</button>
+<label for="ps-idea" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Describe the music you want to create</label>
+<input id="ps-idea" class="idea" type="text" autocomplete="off" placeholder="Describe the music you want to create..." value="{{text}}" onChange="{{onText}}" onKeyDown="{{onIdeaKey}}">
+<button type="button" class="{{advBtnCls}}" aria-label="Advanced settings" aria-expanded="{{advExpanded}}" onClick="{{toggleAdv}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"></line><line x1="10" x2="3" y1="4" y2="4"></line><line x1="21" x2="12" y1="12" y2="12"></line><line x1="8" x2="3" y1="12" y2="12"></line><line x1="21" x2="16" y1="20" y2="20"></line><line x1="12" x2="3" y1="20" y2="20"></line><line x1="14" x2="14" y1="2" y2="6"></line><line x1="8" x2="8" y1="10" y2="14"></line><line x1="16" x2="16" y1="18" y2="22"></line></svg>
+</button>
+<span class="divider" aria-hidden="true"></span>
+<button type="button" class="create sp" onClick="{{create}}">
+<sc-if value="{{building}}" hint-placeholder-val="{{ false }}">
+<span class="eq" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+<span class="create-label">Building</span>
+</sc-if>
+<sc-if value="{{notBuilding}}" hint-placeholder-val="{{ true }}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+<span class="create-label">Create</span>
+</sc-if>
+</button>
+</div>
+
+<sc-if value="{{hasTags}}" hint-placeholder-val="{{ false }}">
+<ul class="tags" aria-label="Selected tags">
+<sc-for list="{{tags}}" as="tag" hint-placeholder-count="2">
+<li class="{{tag.cls}}">{{tag.label}}<button type="button" class="tag-x" aria-label="{{tag.aria}}" onClick="{{tag.remove}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></li>
+</sc-for>
+<li><button type="button" class="link-btn" onClick="{{clearAll}}">Clear all</button></li>
+</ul>
+</sc-if>
+
+<sc-if value="{{advOpen}}" hint-placeholder-val="{{ false }}">
+<div class="adv">
+<div class="field">
+<div class="field-top"><label for="ps-bpm">Tempo</label><b>{{bpm}} BPM</b></div>
+<input id="ps-bpm" class="range" type="range" min="60" max="180" step="1" value="{{bpm}}" onChange="{{onBpm}}">
+</div>
+<div class="field">
+<div class="field-top"><label for="ps-key">Key</label></div>
+<select id="ps-key" class="sel" value="{{musicKey}}" onChange="{{onMusicKey}}">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="3">
+<option value="{{k}}">{{k}}</option>
+</sc-for>
+</select>
+</div>
+<div class="field">
+<div class="field-top"><label for="ps-weird">Weirdness</label><b>{{weird}}%</b></div>
+<input id="ps-weird" class="range" type="range" min="0" max="100" step="1" value="{{weird}}" onChange="{{onWeird}}">
+</div>
+<div class="field">
+<div class="field-top"><label for="ps-infl">Style influence</label><b>{{influence}}%</b></div>
+<input id="ps-infl" class="range" type="range" min="0" max="100" step="1" value="{{influence}}" onChange="{{onInfluence}}">
+</div>
+<div class="field excl">
+<div class="field-top"><label for="ps-exclude">Exclude styles <span style="color: rgba(255,255,255,0.45)">— press Enter to add</span></label></div>
+<div class="excl-box">
+<sc-for list="{{excludes}}" as="ex" hint-placeholder-count="0">
+<span class="excl-chip">{{ex.label}}<button type="button" class="tag-x" style="width: 20px; height: 20px" aria-label="{{ex.aria}}" onClick="{{ex.remove}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></span>
+</sc-for>
+<input id="ps-exclude" class="excl-in" type="text" autocomplete="off" placeholder="{{excludePlaceholder}}" value="{{excludeDraft}}" onChange="{{onExcludeDraft}}" onKeyDown="{{onExcludeKey}}">
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+</div>
+
+<sc-if value="{{hasError}}" hint-placeholder-val="{{ false }}">
+<p class="err" role="alert">{{error}}</p>
+</sc-if>
+
+<ul class="chips" role="tablist" aria-label="Prompt categories">
+<li><button type="button" role="tab" class="{{chips.genre.cls}}" aria-selected="{{chips.genre.selected}}" onClick="{{chips.genre.toggle}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="18" r="4"></circle><path d="M12 18V2l7 4"></path></svg>
+<span>Genre</span>
+<sc-if value="{{chips.genre.has}}" hint-placeholder-val="{{ false }}"><span class="count">{{chips.genre.count}}</span></sc-if>
+</button></li>
+<li><button type="button" role="tab" class="{{chips.mood.cls}}" aria-selected="{{chips.mood.selected}}" onClick="{{chips.mood.toggle}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+<span>Mood</span>
+<sc-if value="{{chips.mood.has}}" hint-placeholder-val="{{ false }}"><span class="count">{{chips.mood.count}}</span></sc-if>
+</button></li>
+<li><button type="button" role="tab" class="{{chips.instruments.cls}}" aria-selected="{{chips.instruments.selected}}" onClick="{{chips.instruments.toggle}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 10v3"></path><path d="M6 6v11"></path><path d="M10 3v18"></path><path d="M14 8v7"></path><path d="M18 5v13"></path><path d="M22 10v3"></path></svg>
+<span>Instruments</span>
+<sc-if value="{{chips.instruments.has}}" hint-placeholder-val="{{ false }}"><span class="count">{{chips.instruments.count}}</span></sc-if>
+</button></li>
+<li><button type="button" role="tab" class="{{chips.vocals.cls}}" aria-selected="{{chips.vocals.selected}}" onClick="{{chips.vocals.toggle}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+<span>Vocals</span>
+<sc-if value="{{chips.vocals.has}}" hint-placeholder-val="{{ false }}"><span class="count">{{chips.vocals.count}}</span></sc-if>
+</button></li>
+<li><button type="button" role="tab" class="{{chips.production.cls}}" aria-selected="{{chips.production.selected}}" onClick="{{chips.production.toggle}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" x2="18" y1="20" y2="10"></line><line x1="12" x2="12" y1="20" y2="4"></line><line x1="6" x2="6" y1="20" y2="14"></line></svg>
+<span>Production</span>
+<sc-if value="{{chips.production.has}}" hint-placeholder-val="{{ false }}"><span class="count">{{chips.production.count}}</span></sc-if>
+</button></li>
+</ul>
+
+<sc-if value="{{showHint}}" hint-placeholder-val="{{ true }}">
+<p class="drag-hint"><span class="m">Grab a floating style and drop it in the bar — or just click it.</span><span class="t">Tap a floating style to add it.</span></p>
+</sc-if>
+
+<sc-if value="{{hasPanel}}" hint-placeholder-val="{{ false }}">
+<div class="{{panelCls}}" role="tabpanel">
+<div class="panel-top">
+<p class="{{hintCls}}">{{hint}}</p>
+<button type="button" class="tag-x" style="width: 36px; height: 36px; flex-shrink: 0" aria-label="Close options" onClick="{{closePanel}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+</div>
+<ul class="opts">
+<sc-for list="{{options}}" as="opt" hint-placeholder-count="6">
+<li><button type="button" class="{{opt.cls}}" aria-pressed="{{opt.pressed}}" onClick="{{opt.pick}}">
+<sc-if value="{{opt.on}}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+{{opt.label}}
+</button></li>
+</sc-for>
+</ul>
+</div>
+</sc-if>
+
+<sc-if value="{{building}}" hint-placeholder-val="{{ false }}">
+<div class="card" aria-hidden="true">
+<div class="skel" style="width: 90%"></div>
+<div class="skel" style="width: 70%"></div>
+<div class="skel" style="width: 45%; margin-bottom: 0"></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ready}}" hint-placeholder-val="{{ false }}">
+<section class="card" aria-live="polite">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px">
+<h2 style="margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.6)">Your Suno prompt</h2>
+<div style="display: flex; gap: 8px">
+<button type="button" class="mini glass sp" onClick="{{reset}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>Start over</button>
+<button type="button" class="mini primary sp" onClick="{{copy}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>{{copyLabel}}</button>
+</div>
+</div>
+<sc-if value="{{hasIdea}}" hint-placeholder-val="{{ true }}">
+<div style="margin-bottom: 16px">
+<div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 4px">Song idea</div>
+<div style="font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.9)">{{resultIdea}}</div>
+</div>
+</sc-if>
+<sc-if value="{{hasStyle}}" hint-placeholder-val="{{ true }}">
+<div>
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 4px"><span>Style of music</span><span>{{styleChars}} chars</span></div>
+<p class="style-box">{{resultStyle}}</p>
+</div>
+</sc-if>
+<sc-if value="{{hasExcludeText}}" hint-placeholder-val="{{ false }}">
+<div style="margin-top: 16px">
+<div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 4px">Exclude</div>
+<div style="font-size: 14px; color: rgba(255,255,255,0.8)">{{excludeText}}</div>
+</div>
+</sc-if>
+<sc-if value="{{advTouched}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-wrap: wrap; gap: 4px 24px; margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.55)"><span>Weirdness {{weird}}%</span><span>Style influence {{influence}}%</span></div>
+</sc-if>
+</section>
+</sc-if>
+</div>
+</section>
+
+<div class="rise d5 strip" style="position: relative; z-index: 10; width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 72px) 44px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 24px">
+<div class="strip-left">
+<sc-if value="{{streamOn}}" hint-placeholder-val="{{ true }}">
+<button type="button" class="strip-ctl" aria-pressed="{{pausePressed}}" onClick="{{togglePause}}">
+<span class="strip-ico" aria-hidden="true">
+<sc-if value="{{showPauseIcon}}" hint-placeholder-val="{{ true }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="3" width="5" height="18" rx="1.5"></rect><rect x="14" y="3" width="5" height="18" rx="1.5"></rect></svg></sc-if>
+<sc-if value="{{showPlayIcon}}" hint-placeholder-val="{{ false }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="7 3 21 12 7 21 7 3"></polygon></svg></sc-if>
+</span>
+<span class="strip-lbl">{{pauseShort}}</span>
+</button>
+</sc-if>
+</div>
+<button type="button" class="scroll-cue" onClick="{{toExplore}}" style="justify-self: center; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px 16px; border-radius: 16px">
+<svg class="bob" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+<span style="font-size: 10px; letter-spacing: 0.34em">SCROLL TO EXPLORE</span>
+</button>
+<div class="tagline" style="display: flex; align-items: center; justify-content: flex-end; gap: 20px">
+<span aria-hidden="true" style="width: 48px; height: 1px; background: rgba(255,255,255,0.4)"></span>
+<p style="margin: 0; font-size: 9.5px; line-height: 1.7; letter-spacing: 0.3em; color: rgba(255,255,255,0.7); white-space: pre-line">A MORE MUSICAL WORLD
+BELONGS TO EVERYONE</p>
+</div>
+</div>
+</div>
+
+<section id="explore" ref="{{setExplore}}" class="explore" aria-labelledby="explore-h">
+<div class="wrap">
+<div class="rv {{rv.exploreHead}}" ref="{{setRv.exploreHead}}" style="text-align: center">
+<p class="eyebrow">EXPLORE MORE</p>
+<h2 id="explore-h" class="h2">Go deeper <span class="grad-text">with Suno</span></h2>
+<p class="lede">Tools, guides, and inspiration to turn your ideas into incredible music.</p>
+</div>
+<div class="cards stg {{rv.cards}}" ref="{{setRv.cards}}">
+<div class="rv-item">
+<article class="xcard c-learn">
+<canvas ref="{{setCard0}}" class="xcard-art" aria-hidden="true"></canvas>
+<div class="xcard-body">
+<span class="xicon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg></span>
+<h3 class="xtitle">LEARN</h3>
+<p class="xsub">Suno v6 knowledge base</p>
+<p class="xdesc">Step-by-step guides, tutorials, and best practices to help you master Suno v6.</p>
+<a class="xbtn" href="#learn">Explore<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>
+</div>
+</article>
+</div>
+<div class="rv-item">
+<article class="xcard c-build">
+<canvas ref="{{setCard1}}" class="xcard-art" aria-hidden="true"></canvas>
+<div class="xcard-body">
+<span class="xicon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path><path d="M20 3v4"></path><path d="M22 5h-4"></path></svg></span>
+<h3 class="xtitle">BUILD</h3>
+<p class="xsub">Smarter Suno v6 prompts</p>
+<p class="xdesc">Learn how to craft better prompts and get the sound you imagine.</p>
+<a class="xbtn" href="#build" onClick="{{navBuild}}">Explore<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>
+</div>
+</article>
+</div>
+<div class="rv-item">
+<article class="xcard c-write">
+<canvas ref="{{setCard2}}" class="xcard-art" aria-hidden="true"></canvas>
+<div class="xcard-body">
+<span class="xicon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg></span>
+<h3 class="xtitle">WRITE</h3>
+<p class="xsub">Creative lyric tool</p>
+<p class="xdesc">Generate, edit, and refine lyrics for any style or mood.</p>
+<a class="xbtn" href="#lyrics">Explore<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>
+</div>
+</article>
+</div>
+</div>
+</div>
+</section>
+
+<section id="pricing" class="wrap duo" aria-label="Pricing and questions">
+<div>
+<div class="rv {{rv.pricingHead}}" ref="{{setRv.pricingHead}}">
+<p class="eyebrow">SIMPLE PRICING</p>
+<h2 class="h2">Create more, <span class="grad-text">your way</span></h2>
+<p class="lede">Start free, or unlock more power to bring bigger ideas to life.</p>
+</div>
+<div class="plans stg {{rv.plans}}" ref="{{setRv.plans}}">
+<div class="rv-item">
+<div class="plan">
+<h3 class="plan-name">Free</h3>
+<p class="plan-tag">Get started and explore.</p>
+<p class="price"><span class="amt"><sup>$</sup>0</span><span class="per">/ forever</span></p>
+<ul class="feats">
+<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Limited song generations</li>
+<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Standard quality</li>
+<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Access to core features</li>
+</ul>
+<button type="button" class="plan-btn sp">Get Started</button>
+</div>
+</div>
+<div class="rv-item">
+<div class="plan pro">
+<span class="badge">MOST POPULAR</span>
+<h3 class="plan-name">Premium</h3>
+<p class="plan-tag">More music. More possibilities.</p>
+<p class="price"><span class="amt"><sup>$</sup>8</span><span class="per">/ month</span></p>
+<ul class="feats">
+<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>High-volume generations</li>
+<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Higher quality audio</li>
+<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Early access to new features</li>
+<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Commercial use</li>
+</ul>
+<button type="button" class="plan-btn pro-btn sp">Go Premium</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="rv {{rv.faq}}" ref="{{setRv.faq}}">
+<p class="eyebrow">QUICK ANSWERS</p>
+<h2 class="h2 sm">Frequently asked questions</h2>
+<div class="faq-list">
+<sc-for list="{{faqItems}}" as="f" hint-placeholder-count="5">
+<div class="{{f.cls}}">
+<h3 style="margin: 0; font-size: inherit; font-weight: inherit"><button type="button" class="faq-q" id="{{f.qid}}" aria-expanded="{{f.expanded}}" aria-controls="{{f.aid}}" onClick="{{f.toggle}}"><span>{{f.q}}</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></h3>
+<sc-if value="{{f.open}}" hint-placeholder-val="{{ false }}">
+<div class="faq-a" id="{{f.aid}}" role="region" aria-labelledby="{{f.qid}}"><p>{{f.a}}</p></div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<a class="faq-more" href="#faq">View all FAQs<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>
+</div>
+</section>
+
+<footer class="foot rv {{rv.footer}}" ref="{{setRv.footer}}">
+<div class="foot-in">
+<div style="display: flex; align-items: center; gap: 20px">
+<a href="#" onClick="{{navBuild}}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #ffffff">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 252 792 280" width="85" height="30" aria-hidden="true" style="display: block; flex-shrink: 0"><defs><linearGradient id="lf-base" gradientUnits="userSpaceOnUse" x1="130" y1="0" x2="720" y2="0"><stop offset="0" stop-color="#d43a10"></stop><stop offset=".2" stop-color="#b3150b"></stop><stop offset=".4" stop-color="#7e0118"></stop><stop offset=".55" stop-color="#6a0030"></stop><stop offset=".8" stop-color="#b0034a"></stop><stop offset="1" stop-color="#cc0a55"></stop></linearGradient><linearGradient id="lf-top" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="606" y2="0"><stop offset="0" stop-color="#fdb41f"></stop><stop offset=".25" stop-color="#fd9e22"></stop><stop offset=".55" stop-color="#fb8a2c"></stop><stop offset=".8" stop-color="#f8622e"></stop><stop offset="1" stop-color="#f04a35"></stop></linearGradient><linearGradient id="lf-band" gradientUnits="userSpaceOnUse" x1="150" y1="0" x2="604" y2="0"><stop offset="0" stop-color="#fdb52a"></stop><stop offset=".45" stop-color="#fec43c"></stop><stop offset=".78" stop-color="#fca735"></stop><stop offset="1" stop-color="#f98e30"></stop></linearGradient><radialGradient id="lf-topred" gradientUnits="userSpaceOnUse" cx="420" cy="400" r="170"><stop offset="0" stop-color="#ee3232" stop-opacity=".55"></stop><stop offset=".55" stop-color="#f04a32" stop-opacity=".2"></stop><stop offset="1" stop-color="#f04a32" stop-opacity="0"></stop></radialGradient><linearGradient id="lf-tophi" gradientUnits="userSpaceOnUse" x1="0" y1="258" x2="0" y2="318"><stop offset="0" stop-color="#ffcb3c" stop-opacity=".95"></stop><stop offset="1" stop-color="#ffcb3c" stop-opacity="0"></stop></linearGradient><linearGradient id="lf-front" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="366" y2="0"><stop offset="0" stop-color="#fdba2c"></stop><stop offset=".32" stop-color="#fd9a33"></stop><stop offset=".6" stop-color="#fe6044"></stop><stop offset=".88" stop-color="#fd3a52"></stop><stop offset="1" stop-color="#fc2c5e"></stop></linearGradient><linearGradient id="lf-lens" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="320" y2="0"><stop offset="0" stop-color="#ffc94a" stop-opacity=".7"></stop><stop offset="1" stop-color="#ffb04a" stop-opacity="0"></stop></linearGradient><linearGradient id="lf-up" gradientUnits="userSpaceOnUse" x1="600" y1="0" x2="799" y2="0"><stop offset="0" stop-color="#b8063f"></stop><stop offset=".25" stop-color="#d70f52"></stop><stop offset=".6" stop-color="#f21657"></stop><stop offset="1" stop-color="#fc1a5a"></stop></linearGradient><radialGradient id="lf-upshade" gradientUnits="userSpaceOnUse" cx="606" cy="392" r="34"><stop offset="0" stop-color="#5a0020" stop-opacity=".35"></stop><stop offset="1" stop-color="#5a0020" stop-opacity="0"></stop></radialGradient><linearGradient id="lf-low" gradientUnits="userSpaceOnUse" x1="370" y1="0" x2="799" y2="0"><stop offset="0" stop-color="#5e0028"></stop><stop offset=".18" stop-color="#a8034a"></stop><stop offset=".35" stop-color="#d80c5e"></stop><stop offset=".54" stop-color="#f42273"></stop><stop offset=".77" stop-color="#fd4b88"></stop><stop offset="1" stop-color="#fb2f70"></stop></linearGradient><linearGradient id="lf-lowrim" gradientUnits="userSpaceOnUse" x1="0" y1="470" x2="0" y2="527"><stop offset="0" stop-color="#b8003c" stop-opacity="0"></stop><stop offset="1" stop-color="#b8003c" stop-opacity=".75"></stop></linearGradient></defs><path d="M19,488 C20,486 19,485 25,478 C31,471 44,456 53,446 C62,436 72,427 81,418 C90,409 100,399 109,390 C118,381 128,371 137,362 C146,353 156,344 165,336 C174,328 184,320 193,313 C202,306 212,300 221,294 C230,288 240,284 249,280 C258,276 268,273 277,270 C286,267 296,265 305,263 C314,261 324,260 333,259 C342,258 352,258 361,259 C370,260 380,260 389,262 C398,264 408,266 417,268 C426,270 436,273 445,277 C454,281 464,286 473,291 C482,296 492,302 501,308 C510,314 520,321 529,328 C538,335 548,344 557,351 C566,358 576,367 585,372 C594,377 604,382 613,381 C622,380 632,368 641,363 C650,358 660,355 669,352 C678,349 688,346 697,345 C706,344 716,344 725,344 C734,344 744,345 753,347 C762,349 773,352 781,356 C789,360 796,367 799,369 C796,373 789,384 781,394 C773,404 762,417 753,427 C744,437 734,446 725,455 C716,464 706,472 697,479 C688,486 678,493 669,498 C660,503 650,507 641,511 C632,515 622,518 613,520 C604,522 594,524 585,525 C576,526 566,526 557,526 C548,526 538,525 529,523 C520,521 510,518 501,515 C492,512 482,508 473,503 C464,498 454,492 445,486 C436,480 430,475 417,466 C404,457 379,434 365,431 C351,428 343,443 333,449 C323,455 314,463 305,469 C296,475 286,482 277,487 C268,492 258,498 249,502 C240,506 230,510 221,513 C212,516 202,518 193,520 C184,522 174,523 165,524 C156,525 146,524 137,524 C128,524 118,522 109,521 C100,520 90,518 81,515 C72,512 62,509 53,505 C44,501 31,495 25,492 C19,489 20,489 19,488 Z" fill="url(#lf-base)"></path><path d="M19,488 C20,486 19,485 25,478 C31,471 44,456 53,446 C62,436 72,427 81,418 C90,409 100,399 109,390 C118,381 128,371 137,362 C146,353 156,344 165,336 C174,328 184,320 193,313 C202,306 212,300 221,294 C230,288 240,284 249,280 C258,276 268,273 277,270 C286,267 296,265 305,263 C314,261 324,260 333,259 C342,258 352,258 361,259 C370,260 380,260 389,262 C398,264 408,266 417,268 C426,270 436,273 445,277 C454,281 464,286 473,291 C482,296 492,302 501,308 C510,314 520,321 529,328 C538,335 548,344 557,351 C566,358 577,367 585,372 C593,377 602,381 606,383 C606,384 610,386 606,388 C602,390 592,395 585,396 C578,397 571,393 565,392 C559,391 555,390 550,389 C545,388 542,388 535,387 C528,386 515,386 505,386 C495,386 485,387 475,388 C465,389 455,391 445,393 C435,395 425,398 415,402 C405,406 393,410 385,415 C377,420 369,428 366,430 C364,427 358,418 352,412 C346,406 339,400 330,394 C321,388 310,381 300,376 C290,371 280,367 270,364 C260,361 250,358 240,356 C230,354 220,353 210,354 C200,355 190,357 180,360 C170,363 160,367 150,373 C140,379 128,387 120,394 C112,401 110,404 100,414 C90,424 74,440 60,452 C46,464 26,482 19,488 Z" fill="url(#lf-top)"></path><path d="M19,488 C20,486 19,485 25,478 C31,471 44,456 53,446 C62,436 72,427 81,418 C90,409 100,399 109,390 C118,381 128,371 137,362 C146,353 156,344 165,336 C174,328 184,320 193,313 C202,306 212,300 221,294 C230,288 240,284 249,280 C258,276 268,273 277,270 C286,267 296,265 305,263 C314,261 324,260 333,259 C342,258 352,258 361,259 C370,260 380,260 389,262 C398,264 408,266 417,268 C426,270 436,273 445,277 C454,281 464,286 473,291 C482,296 492,302 501,308 C510,314 520,321 529,328 C538,335 548,344 557,351 C566,358 577,367 585,372 C593,377 602,381 606,383 C606,384 610,386 606,388 C602,390 592,395 585,396 C578,397 571,393 565,392 C559,391 555,390 550,389 C545,388 542,388 535,387 C528,386 515,386 505,386 C495,386 485,387 475,388 C465,389 455,391 445,393 C435,395 425,398 415,402 C405,406 393,410 385,415 C377,420 369,428 366,430 C364,427 358,418 352,412 C346,406 339,400 330,394 C321,388 310,381 300,376 C290,371 280,367 270,364 C260,361 250,358 240,356 C230,354 220,353 210,354 C200,355 190,357 180,360 C170,363 160,367 150,373 C140,379 128,387 120,394 C112,401 110,404 100,414 C90,424 74,440 60,452 C46,464 26,482 19,488 Z" fill="url(#lf-topred)"></path><path d="M165,336 C170,332 184,320 193,313 C202,306 212,300 221,294 C230,288 240,284 249,280 C258,276 268,273 277,270 C286,267 296,265 305,263 C314,261 324,260 333,259 C342,258 352,258 361,259 C370,260 380,260 389,262 C398,264 408,266 417,268 C426,270 436,273 445,277 C454,281 464,286 473,291 C482,296 492,302 501,308 C510,314 520,321 529,328 C538,335 548,344 557,351 C566,358 577,366 585,372 C593,378 601,382 604,384 C600,384 591,390 580,386 C569,382 553,369 540,362 C527,355 515,349 500,342 C485,335 467,324 450,319 C433,314 417,312 400,309 C383,306 367,304 350,304 C333,304 317,306 300,308 C283,310 267,313 250,319 C233,325 214,336 200,342 C186,348 171,357 165,356 C159,355 165,339 165,336 Z" fill="url(#lf-band)"></path><path d="M19,488 C26,482 46,464 60,452 C74,440 88,424 100,414 C112,404 120,399 130,393 C140,387 150,381 160,376 C170,371 181,366 190,364 C199,362 207,361 215,362 C223,363 232,366 240,369 C248,372 256,376 265,379 C274,382 285,386 295,390 C305,394 316,399 325,404 C334,409 343,416 350,420 C357,424 363,428 366,430 C360,433 343,442 333,449 C323,456 314,463 305,469 C296,475 286,482 277,487 C268,492 258,498 249,502 C240,506 230,510 221,513 C212,516 202,518 193,520 C184,522 174,523 165,524 C156,525 146,524 137,524 C128,524 118,522 109,521 C100,520 90,518 81,515 C72,512 62,509 53,505 C44,501 31,495 25,492 C19,489 20,489 19,488 Z" fill="url(#lf-front)"></path><path d="M19,488 C31,487 65,482 90,480 C115,478 143,479 170,476 C197,473 225,469 250,464 C275,459 307,449 318,446 C316,450 312,462 305,469 C298,476 286,482 277,487 C268,492 258,498 249,502 C240,506 230,510 221,513 C212,516 202,518 193,520 C184,522 174,523 165,524 C156,525 146,524 137,524 C128,524 118,522 109,521 C100,520 90,518 81,515 C72,512 62,509 53,505 C44,501 31,495 25,492 C19,489 20,489 19,488 Z" fill="url(#lf-lens)"></path><path d="M598,384 C600,384 606,384 613,381 C620,378 632,368 641,363 C650,358 660,355 669,352 C678,349 688,346 697,345 C706,344 716,344 725,344 C734,344 744,345 753,347 C762,349 773,352 781,356 C789,360 796,367 799,369 C794,373 780,387 770,394 C760,401 749,407 740,411 C731,415 724,417 715,418 C706,419 695,418 685,417 C675,416 662,413 655,411 C648,409 645,408 640,407 C635,406 630,404 625,403 C620,402 614,400 610,398 C606,396 600,390 598,388 C596,386 598,385 598,384 Z" fill="url(#lf-up)"></path><path d="M598,384 C600,384 606,384 613,381 C620,378 632,368 641,363 C650,358 660,355 669,352 C678,349 688,346 697,345 C706,344 716,344 725,344 C734,344 744,345 753,347 C762,349 773,352 781,356 C789,360 796,367 799,369 C794,373 780,387 770,394 C760,401 749,407 740,411 C731,415 724,417 715,418 C706,419 695,418 685,417 C675,416 662,413 655,411 C648,409 645,408 640,407 C635,406 630,404 625,403 C620,402 614,400 610,398 C606,396 600,390 598,388 C596,386 598,385 598,384 Z" fill="url(#lf-upshade)"></path><path d="M366,430 C369,430 377,430 385,428 C393,426 405,423 415,421 C425,419 435,417 445,416 C455,415 465,414 475,413 C485,412 495,412 505,413 C515,414 525,415 535,416 C545,417 554,419 565,421 C576,423 588,426 600,428 C612,430 628,433 640,434 C652,435 660,434 670,432 C680,430 688,428 700,425 C712,422 728,417 740,412 C752,407 760,401 770,394 C780,387 794,373 799,369 C796,373 789,384 781,394 C773,404 762,417 753,427 C744,437 734,446 725,455 C716,464 706,472 697,479 C688,486 678,493 669,498 C660,503 650,507 641,511 C632,515 622,518 613,520 C604,522 594,524 585,525 C576,526 566,526 557,526 C548,526 538,525 529,523 C520,521 510,518 501,515 C492,512 482,508 473,503 C464,498 454,492 445,486 C436,480 430,475 417,466 C404,457 374,436 366,430 Z" fill="url(#lf-low)"></path><path d="M366,430 C369,430 377,430 385,428 C393,426 405,423 415,421 C425,419 435,417 445,416 C455,415 465,414 475,413 C485,412 495,412 505,413 C515,414 525,415 535,416 C545,417 554,419 565,421 C576,423 588,426 600,428 C612,430 628,433 640,434 C652,435 660,434 670,432 C680,430 688,428 700,425 C712,422 728,417 740,412 C752,407 760,401 770,394 C780,387 794,373 799,369 C796,373 789,384 781,394 C773,404 762,417 753,427 C744,437 734,446 725,455 C716,464 706,472 697,479 C688,486 678,493 669,498 C660,503 650,507 641,511 C632,515 622,518 613,520 C604,522 594,524 585,525 C576,526 566,526 557,526 C548,526 538,525 529,523 C520,521 510,518 501,515 C492,512 482,508 473,503 C464,498 454,492 445,486 C436,480 430,475 417,466 C404,457 374,436 366,430 Z" fill="url(#lf-lowrim)"></path></svg>
+<span style="font-size: 26px; font-weight: 800; letter-spacing: -0.03em">PromptSuno</span>
+</a>
+<p class="foot-tag" style="margin: 0; font-size: 13px; line-height: 1.4; color: rgba(255,255,255,0.6); white-space: pre-line">A more musical world
+belongs to everyone.</p>
+</div>
+<nav aria-label="Footer" class="foot-links">
+<a href="#product">Product</a>
+<a href="#explore" onClick="{{navExplore}}">Explore</a>
+<a href="#pricing">Pricing</a>
+<a href="#blog">Blog</a>
+<a href="#help">Help</a>
+</nav>
+<div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap">
+<div class="socials">
+<a href="#x">X</a>
+<a href="#discord">Discord</a>
+<a href="#youtube">YouTube</a>
+<a href="#instagram">Instagram</a>
+</div>
+<span aria-hidden="true" class="foot-div"></span>
+<div style="font-size: 13px; color: rgba(255,255,255,0.6)">
+<p style="margin: 0 0 8px">© 2026 PromptSuno. All rights reserved.</p>
+<div class="legal"><a href="#terms">Terms</a><a href="#privacy">Privacy</a><a href="#cookies">Cookies</a></div>
+</div>
+</div>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"animateWaves":{"editor":"boolean","default":true},"streamingTags":{"editor":"boolean","default":true},"$preview":{"width":1440,"height":2520}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.cats = [
+      { id: 'genre', max: 2, hint: 'Pick up to 2 — a blend gives Suno a clearer target than a list.', options: ['Synthwave', 'Lo-fi hip hop', 'Indie folk', 'Drum and bass', 'Cinematic orchestral', 'Afrobeats', 'Dream pop', 'Delta blues', 'Hyperpop', 'Neo-soul'] },
+      { id: 'mood', max: 2, hint: 'One or two moods. More than that tends to cancel out.', options: ['Euphoric', 'Melancholic', 'Nostalgic', 'Dark', 'Uplifting', 'Dreamy', 'Aggressive', 'Intimate'] },
+      { id: 'instruments', max: 4, hint: 'Name the lead sounds you want in front of the mix.', options: ['Analog synths', 'Fingerpicked acoustic', '808 bass', 'String quartet', 'Rhodes piano', 'Pedal steel', 'Breakbeat drums', 'Brass section'] },
+      { id: 'vocals', max: 1, hint: 'One vocal direction. Pick Instrumental for no vocals.', options: ['Breathy female', 'Raspy male', 'Gospel choir', 'Whispered', 'Falsetto', 'Male–female duet', 'Instrumental'] },
+      { id: 'production', max: 3, hint: 'Mix and texture cues — up to 3.', options: ['Lo-fi tape', 'Wide stereo', 'Punchy compression', 'Lush reverb', 'Sidechain pump', 'Vinyl crackle', 'Polished pop mix'] }
+    ];
+    this.byId = {};
+    var self = this;
+    this.cats.forEach(function (c) { self.byId[c.id] = c; });
+    this.keys = ['Any key', 'C major', 'A minor', 'D minor', 'E minor', 'F major', 'G major', 'B♭ major', 'F♯ minor'];
+    this.ideas = [
+      'a late-night drive through a neon city after a breakup',
+      'sunrise over a foggy harbor, slow and hopeful',
+      'a basement party that spills into the street at 3am',
+      'an old porch, a storm rolling in, one guitar',
+      'the final boss fight in a retro space shooter'
+    ];
+    this.state = {
+      text: '', sel: { genre: [], mood: [], instruments: [], vocals: [], production: [] },
+      open: null, closing: false, nudge: null, leaving: {},
+      adv: false, advTouched: false, bpm: 100, musicKey: 'Any key', weird: 50, influence: 60,
+      excludes: [], excludeDraft: '',
+      status: 'idle', result: null, copy: 'idle', error: null, shake: false, nav: false,
+      faq: -1, seen: {},
+      dragging: false, dropHot: false, paused: false, streamTick: 0
+    };
+    this.timers = [];
+    this.setCanvas = this.setCanvas.bind(this);
+
+    /* below-the-fold: scroll choreography, reveals, card art, FAQ */
+    this.heroP = 0;
+    this.gliding = false;
+    this.onWheel = this.onWheel.bind(this);
+    this.onScroll = this.onScroll.bind(this);
+    this.setRoot = this.setRoot.bind(this);
+    this.setHero = function (el) { self.heroEl = el; };
+    this.setExplore = function (el) { self.exploreEl = el; };
+    this.revealRefs = {};
+    ['exploreHead', 'cards', 'pricingHead', 'plans', 'faq', 'footer'].forEach(function (k) {
+      self.revealRefs[k] = function (el) { self.observe(k, el); };
+    });
+    this.cardCanvases = [null, null, null];
+    this.cardPalettes = [
+      [[255, 120, 20], [255, 205, 95]],
+      [[255, 30, 80], [255, 120, 160]],
+      [[165, 60, 255], [255, 60, 190]]
+    ];
+    this.setCard = [0, 1, 2].map(function (i) {
+      return function (el) {
+        self.cardCanvases[i] = el ? { el: el, ctx: el.getContext('2d'), w: 0, h: 0 } : null;
+      };
+    });
+    this.faqs = [
+      { q: 'What is Suno v6?', a: 'Suno v6 is the Suno model version PromptSuno’s guides and prompt builder are tuned for. [Add a one-line summary of what changed in v6.]' },
+      { q: 'Do I own the music I create?', a: 'Song ownership is set by Suno’s terms and your Suno plan, not by PromptSuno. Suno has historically tied ownership to paid plans — check its current terms before you release anything.' },
+      { q: 'Can I use the music commercially?', a: 'Commercial rights to the audio come from your Suno plan. [Spell out exactly what “Commercial use” on PromptSuno Premium covers.]' },
+      { q: 'What’s included in the Premium plan?', a: 'Everything in Free, plus high-volume prompt building and early access to new tools. [List the rest of your Premium features.]' },
+      { q: 'Can I upgrade or cancel anytime?', a: 'You can upgrade from your account at any time. [State your cancellation and refund terms.]' }
+    ];
+
+    /* ── streaming style tags ── */
+    this.catRgb = { genre: [166, 92, 255], mood: [77, 141, 255], instruments: [255, 138, 42], vocals: [255, 79, 154], production: [47, 212, 194] };
+    this.catNames = { genre: 'Genre', mood: 'Mood', instruments: 'Instruments', vocals: 'Vocals', production: 'Production' };
+    this.pool = [];
+    this.cats.forEach(function (c) { c.options.forEach(function (o) { self.pool.push({ label: o, cat: c.id }); }); });
+    this.N = 22;
+    this.bursts = [];
+    this.tagT0 = performance.now();
+    this.slots = []; this.slotRef = []; this.slotDown = []; this.slotEnter = []; this.slotLeave = [];
+    for (var si = 0; si < this.N; si++) {
+      this.slots.push({ el: null });
+      this.spawn(this.slots[si], true);
+      (function (i) {
+        self.slotRef.push(function (el) { self.slots[i].el = el; });
+        self.slotDown.push(function (e) { self.tagDown(i, e); });
+        self.slotEnter.push(function () { self.slots[i].hover = true; });
+        self.slotLeave.push(function () { self.slots[i].hover = false; });
+      })(si);
+    }
+    this.setLayer = function (el) { self.layerEl = el; };
+    this.setBar = function (el) { self.barEl = el; };
+    this.onPtr = function (e) { self.ptr = { x: e.clientX, y: e.clientY }; };
+    this.onPtrLeave = function () { self.ptr = null; };
+    this.onDragMove = this.onDragMove.bind(this);
+    this.onDragUp = this.onDragUp.bind(this);
+  }
+
+  spawn(slot, initial) {
+    var sel = this.state.sel, used = {};
+    this.slots.forEach(function (o) { if (o && o !== slot && o.label) used[o.label] = 1; });
+    var cands = this.pool.filter(function (p) { return !used[p.label] && sel[p.cat].indexOf(p.label) === -1; });
+    if (!cands.length) cands = this.pool;
+    var p = cands[Math.floor(Math.random() * cands.length)];
+    var right = Math.random() < 0.5;
+    slot.label = p.label; slot.cat = p.cat;
+    slot.theta = (right ? 0 : Math.PI) + (Math.random() - 0.5) * 1.75;
+    slot.d = initial ? Math.random() * 0.92 : 0;
+    slot.life = 10 + Math.random() * 6;
+    slot.phase = Math.random() * 6.28;
+    slot.size = 0.85 + Math.random() * 0.35;
+    slot.pop = 0; slot.fly = null; slot.hover = false; slot.dragging = false;
+  }
+
+  tagDown(i, e) {
+    var slot = this.slots[i];
+    if (!slot.el || slot.fly || slot.pop > 0 || this.drag || !this.layerEl) return;
+    if (e.pointerType !== 'touch') e.preventDefault();
+    var lr = this.layerEl.getBoundingClientRect();
+    this.drag = { i: i, sx: e.clientX, sy: e.clientY, cx: e.clientX, cy: e.clientY, moved: false, touch: e.pointerType === 'touch',
+      offX: e.clientX - lr.left - (slot.x || 0), offY: e.clientY - lr.top - (slot.y || 0), t0: performance.now() };
+    slot.dragging = true;
+    window.addEventListener('pointermove', this.onDragMove);
+    window.addEventListener('pointerup', this.onDragUp);
+    window.addEventListener('pointercancel', this.onDragUp);
+  }
+
+  endDragListeners() {
+    window.removeEventListener('pointermove', this.onDragMove);
+    window.removeEventListener('pointerup', this.onDragUp);
+    window.removeEventListener('pointercancel', this.onDragUp);
+  }
+
+  overBar(x, y) {
+    if (!this.barEl) return false;
+    var r = this.barEl.getBoundingClientRect(), pad = 56;
+    return x > r.left - pad && x < r.right + pad && y > r.top - pad && y < r.bottom + pad;
+  }
+
+  onDragMove(e) {
+    var d = this.drag;
+    if (!d) return;
+    if (!d.moved && Math.abs(e.clientX - d.sx) + Math.abs(e.clientY - d.sy) > 7) {
+      if (d.touch) { this.slots[d.i].dragging = false; this.drag = null; this.endDragListeners(); return; } /* touch: let the page scroll */
+      d.moved = true;
+      this.setState({ dragging: true });
+    }
+    d.cx = e.clientX; d.cy = e.clientY;
+    if (d.moved) {
+      var hot = this.overBar(e.clientX, e.clientY);
+      if (hot !== this.state.dropHot) this.setState({ dropHot: hot });
+    }
+  }
+
+  onDragUp(e) {
+    var d = this.drag;
+    if (!d) return;
+    this.endDragListeners();
+    var slot = this.slots[d.i];
+    slot.dragging = false;
+    this.drag = null;
+    var cancelled = e.type === 'pointercancel';
+    var tapped = !cancelled && !d.moved && performance.now() - d.t0 < 600;
+    if (!cancelled && ((d.moved && this.overBar(e.clientX, e.clientY)) || tapped)) this.acceptSlot(slot);
+    else if (d.moved) slot.pop = 0.0001;
+    if (this.state.dragging || this.state.dropHot) this.setState({ dragging: false, dropHot: false });
+  }
+
+  addStyle(catId, label) {
+    var cat = this.byId[catId], cur = this.state.sel[catId];
+    if (cur.indexOf(label) > -1) return 'dup';
+    var next;
+    if (cat.max === 1) next = [label];
+    else if (cur.length >= cat.max) return 'full';
+    else next = cur.concat([label]);
+    var sel = Object.assign({}, this.state.sel); sel[catId] = next;
+    this.dirty({ sel: sel });
+    return 'ok';
+  }
+
+  flash(msg) {
+    var self = this;
+    this.setState({ error: msg });
+    this.later(function () { if (self.state.error === msg) self.setState({ error: null }); }, 2600);
+  }
+
+  acceptSlot(slot) {
+    var res = this.addStyle(slot.cat, slot.label);
+    if (res === 'ok' && this.barEl && this.layerEl) {
+      var lr = this.layerEl.getBoundingClientRect(), br = this.barEl.getBoundingClientRect();
+      slot.fly = { x0: slot.x, y0: slot.y, s0: slot.s, x1: br.left - lr.left + br.width * 0.32, y1: br.top - lr.top + 42, t0: performance.now() };
+    } else {
+      slot.pop = 0.0001;
+      if (res === 'dup') this.flash('“' + slot.label + '” is already in your prompt.');
+      else if (res === 'full') this.flash(this.catNames[slot.cat] + ' is full — remove one to add another.');
+    }
+  }
+
+  burst(slot) {
+    if (slot.x == null) return;
+    this.bursts.push({ x: slot.x, y: slot.y, rgb: this.catRgb[slot.cat], t0: performance.now() });
+    if (this.bursts.length > 14) this.bursts.shift();
+  }
+
+  stepTags(now, dt) {
+    if (!this.layerEl) return;
+    var lr = this.layerEl.getBoundingClientRect();
+    var W = lr.width, H = lr.height;
+    if (!W || !H) return;
+    var narrow = W < 768, active = narrow ? 12 : this.N;
+    var still = this.reduce || this.state.paused;
+    var cx = W * 0.5, cy = H * 0.5, Rf = Math.min(W, 1400) * 0.05, Rn = W * 0.6;
+    var colHalf = Math.min(450, W * 0.31);
+    var px = this.ptr ? this.ptr.x - lr.left : -9999, py = this.ptr ? this.ptr.y - lr.top : -9999;
+    var intro = Math.min(1, (now - this.tagT0) / 1400);
+    var smooth = function (a, b, x) { var k = Math.max(0, Math.min(1, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
+    var respawned = false;
+    for (var i = 0; i < this.N; i++) {
+      var s = this.slots[i], el = s.el;
+      if (!el) continue;
+      if (i >= active) { if (el.style.visibility !== 'hidden') el.style.visibility = 'hidden'; continue; }
+      if (el.style.visibility === 'hidden') el.style.visibility = '';
+      var x, y, sc, op, blur = 0, z = 1;
+      var d = Math.min(1, s.d);
+      if (s.fly) {
+        var k = Math.min(1, (now - s.fly.t0) / 480), ez = 1 - Math.pow(1 - k, 3);
+        x = s.fly.x0 + (s.fly.x1 - s.fly.x0) * ez;
+        y = s.fly.y0 + (s.fly.y1 - s.fly.y0) * ez - Math.sin(k * Math.PI) * 40;
+        sc = s.fly.s0 + (0.55 - s.fly.s0) * ez;
+        op = 1 - Math.max(0, (k - 0.6) / 0.4);
+        z = 60;
+        if (k >= 1) { this.spawn(s, false); respawned = true; op = 0; }
+      } else if (s.dragging && this.drag && this.drag.moved) {
+        x = this.drag.cx - lr.left - this.drag.offX;
+        y = this.drag.cy - lr.top - this.drag.offY;
+        sc = (s.s || 1) + (1.1 - (s.s || 1)) * 0.2;
+        op = 1; z = 60;
+      } else {
+        var near = Math.abs(px - (s.x || 0)) + Math.abs(py - (s.y || 0)) < 200 * Math.max(0.6, s.s || 0.5);
+        var speed = (still || s.dragging || s.hover) ? 0 : (near ? 0.18 : 1);
+        if (s.pop > 0) {
+          s.pop += dt / 0.38;
+          if (s.pop >= 1) { this.burst(s); this.spawn(s, false); respawned = true; d = 0; }
+        } else {
+          s.d += dt / s.life * speed;
+          if (s.d >= 1) s.pop = 0.0001;
+          d = Math.min(1, s.d);
+        }
+        var th = s.theta + Math.sin(now * 0.0003 + s.phase) * 0.05;
+        var R = Rf + (Rn - Rf) * Math.pow(d, 1.7);
+        x = cx + Math.cos(th) * R;
+        y = cy + Math.sin(th) * R * 0.72;
+        sc = (0.26 + 1.1 * d * d) * s.size * (narrow ? 0.75 : 1);
+        op = smooth(0, 0.2, d) * (0.35 + 0.65 * d);
+        if (Math.abs(x - cx) < colHalf && y > H * 0.12 && y < H * 0.84) op *= 0.28; /* keep the copy column readable */
+        if (s.pop > 0) { var pp = Math.min(1, s.pop); sc *= 1 + 0.45 * pp; op *= 1 - pp; blur = pp * 6; }
+        z = 1 + Math.round(d * 8);
+      }
+      s.x = x; s.y = y; s.s = sc;
+      var o = op * intro;
+      el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) translate(-50%,-50%) scale(' + sc.toFixed(3) + ')';
+      el.style.opacity = o.toFixed(3);
+      el.style.filter = blur ? 'blur(' + blur.toFixed(1) + 'px)' : '';
+      el.style.zIndex = String(z);
+      el.style.pointerEvents = (o > 0.2 || z === 60) ? '' : 'none';
+    }
+    if (respawned) this.setState({ streamTick: this.state.streamTick + 1 });
+  }
+
+  drawBursts(ctx) {
+    var nowMs = performance.now(), bs = this.bursts;
+    for (var bi = bs.length - 1; bi >= 0; bi--) {
+      var B = bs[bi], age = (nowMs - B.t0) / 650;
+      if (age >= 1) { bs.splice(bi, 1); continue; }
+      for (var q = 0; q < 16; q++) {
+        var ang = q / 16 * 6.283 + B.t0;
+        var rr = 8 + age * 70 * (0.6 + 0.4 * Math.sin(q * 7.1));
+        ctx.fillStyle = 'rgba(' + B.rgb.join(',') + ',' + (0.9 * (1 - age)).toFixed(3) + ')';
+        ctx.beginPath();
+        ctx.arc(B.x + Math.cos(ang) * rr, B.y + Math.sin(ang) * rr, 1.8 * (1 - age) + 0.4, 0, 6.283);
+        ctx.fill();
+      }
+    }
+  }
+
+  scroller() { return document.scrollingElement || document.documentElement; }
+
+  canScroll() { var se = this.scroller(); return se.scrollHeight - se.clientHeight > 40; }
+
+  glideTo(y, then) {
+    var self = this, se = this.scroller();
+    var from = se.scrollTop, to = Math.max(0, Math.min(se.scrollHeight - se.clientHeight, y));
+    if (Math.abs(to - from) < 2) { if (then) then(); return; }
+    if (this.reduce) { se.scrollTop = to; if (then) then(); return; }
+    if (this.glideRaf) cancelAnimationFrame(this.glideRaf);
+    var dur = Math.min(1300, 700 + Math.abs(to - from) * 0.35), start = performance.now();
+    var ease = function (x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+    this.gliding = true;
+    var step = function (now) {
+      var k = Math.min(1, (now - start) / dur);
+      se.scrollTop = from + (to - from) * ease(k);
+      if (k < 1) self.glideRaf = requestAnimationFrame(step);
+      else { self.gliding = false; self.glideRaf = 0; self.lockUntil = performance.now() + 450; if (then) then(); }
+    };
+    this.glideRaf = requestAnimationFrame(step);
+  }
+
+  exploreTop() {
+    if (!this.exploreEl) return null;
+    return this.exploreEl.getBoundingClientRect().top + this.scroller().scrollTop;
+  }
+
+  glideToExplore() {
+    if (!this.exploreEl) return;
+    if (!this.canScroll()) { try { this.exploreEl.scrollIntoView({ behavior: 'smooth' }); } catch (e) {} return; }
+    this.glideTo(this.exploreTop());
+  }
+
+  glideToBuilder() {
+    this.glideTo(0, function () {
+      var input = document.getElementById('ps-idea');
+      if (input) { try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); } }
+    });
+  }
+
+  /* One wheel flick at the hero's bottom edge glides into Explore; one flick up at Explore's top glides back. */
+  onWheel(e) {
+    if (this.reduce || !this.exploreEl || !this.canScroll()) return;
+    if (e.ctrlKey) return;
+    if (this.gliding || performance.now() < (this.lockUntil || 0)) { e.preventDefault(); return; }
+    var se = this.scroller(), y = se.scrollTop, vh = se.clientHeight;
+    var dist = this.exploreTop() - y;
+    if (e.deltaY > 4 && dist > 2 && dist <= vh + 4) { e.preventDefault(); this.glideTo(y + dist); }
+    else if (e.deltaY < -4 && Math.abs(dist) < 60) { e.preventDefault(); this.glideTo(Math.max(0, y + dist - vh)); }
+  }
+
+  onScroll() {
+    if (!this.heroEl) return;
+    var se = this.scroller(), vh = se.clientHeight || 1, H = this.heroEl.offsetHeight;
+    var p = Math.max(0, Math.min(1, (se.scrollTop - (H - vh)) / vh));
+    this.heroP = p;
+    this.heroEl.style.setProperty('--p', p.toFixed(3));
+  }
+
+  setRoot(el) {
+    if (this.rootEl) {
+      this.rootEl.removeEventListener('wheel', this.onWheel);
+      this.rootEl.removeEventListener('pointermove', this.onPtr);
+      this.rootEl.removeEventListener('pointerleave', this.onPtrLeave);
+    }
+    this.rootEl = el;
+    if (el) {
+      this.reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      el.addEventListener('wheel', this.onWheel, { passive: false });
+      el.addEventListener('pointermove', this.onPtr, { passive: true });
+      el.addEventListener('pointerleave', this.onPtrLeave);
+      window.addEventListener('scroll', this.onScroll, { passive: true });
+    } else {
+      window.removeEventListener('scroll', this.onScroll);
+    }
+  }
+
+  /* Reveal on scroll. Content stays visible unless the observer reports it off-screen first,
+     so canvas thumbnails and exports never show empty sections. */
+  observe(key, el) {
+    if (!el || !window.IntersectionObserver) return;
+    var self = this;
+    if (!this.io) {
+      this.io = new IntersectionObserver(function (entries) {
+        var changes = {};
+        entries.forEach(function (en) {
+          var k = en.target.getAttribute('data-rv');
+          if (!k) return;
+          changes[k] = en.isIntersecting;
+          if (en.isIntersecting) self.io.unobserve(en.target);
+        });
+        self.setState(function (st) {
+          var seen = Object.assign({}, st.seen), changed = false;
+          Object.keys(changes).forEach(function (k) {
+            var prev = seen[k];
+            if (prev === true) return;
+            var v = changes[k] ? true : (prev === undefined ? false : prev);
+            if (v !== prev) { seen[k] = v; changed = true; }
+          });
+          return changed ? { seen: seen } : null;
+        });
+      }, { threshold: 0.15 });
+    }
+    el.setAttribute('data-rv', key);
+    this.io.observe(el);
+  }
+
+  drawRibbon(ctx, w, h, t, pal) {
+    var c0 = pal[0], c1 = pal[1];
+    ctx.clearRect(0, 0, w, h);
+    ctx.globalCompositeOperation = 'lighter';
+    var g = ctx.createRadialGradient(w * 0.8, h * 0.38, 0, w * 0.8, h * 0.38, w * 0.5);
+    g.addColorStop(0, 'rgba(' + c0.join(',') + ',0.2)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    for (var j = 0; j < 6; j++) {
+      var bx = w * (0.6 + j * 0.055), by = h * 0.6;
+      var bh = h * (0.1 + 0.16 * (0.5 + 0.5 * Math.sin(t * 1.5 + j * 1.3)));
+      var bg = ctx.createLinearGradient(0, by - bh, 0, by);
+      bg.addColorStop(0, 'rgba(0,0,0,0)'); bg.addColorStop(1, 'rgba(' + c1.join(',') + ',0.55)');
+      ctx.fillStyle = bg; ctx.fillRect(bx, by - bh, 3, bh);
+    }
+    var lines = 16;
+    for (var i = 0; i < lines; i++) {
+      var mix = i / (lines - 1), k = mix - 0.5;
+      var r = Math.round(c0[0] + (c1[0] - c0[0]) * mix), gg = Math.round(c0[1] + (c1[1] - c0[1]) * mix), b = Math.round(c0[2] + (c1[2] - c0[2]) * mix);
+      for (var px = 0; px <= w; px += 4) {
+        var u = px / w;
+        var y = h * (0.7 - 0.42 * u) + k * h * (0.05 + 0.24 * Math.sin(Math.min(u * 1.15, 1) * Math.PI))
+          + Math.sin(u * 5.5 + t * 0.7 + i * 0.12) * h * 0.07;
+        var core = Math.max(0.1, 1 - Math.abs(k) * 1.4);
+        var a = Math.pow(u, 1.5) * 0.95 * core * (0.7 + 0.3 * Math.sin(px * 0.3 + t * 2.2 + i));
+        if (a < 0.02) continue;
+        ctx.fillStyle = 'rgba(' + r + ',' + gg + ',' + b + ',' + a.toFixed(3) + ')';
+        ctx.fillRect(px, y, 1.6, 1.6);
+      }
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  drawCards(t) {
+    for (var ci = 0; ci < 3; ci++) {
+      var cc = this.cardCanvases[ci];
+      if (!cc || !cc.ctx) continue;
+      var cw = cc.el.clientWidth, ch = cc.el.clientHeight;
+      if (!cw || !ch) continue;
+      var rect = cc.el.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > (window.innerHeight || 0) + 40) continue;
+      if (cw !== cc.w || ch !== cc.h) {
+        var d = Math.min(window.devicePixelRatio || 1, 1.5);
+        cc.el.width = Math.round(cw * d); cc.el.height = Math.round(ch * d);
+        cc.ctx.setTransform(d, 0, 0, d, 0, 0); cc.w = cw; cc.h = ch;
+      }
+      this.drawRibbon(cc.ctx, cw, ch, t, this.cardPalettes[ci]);
+    }
+  }
+
+  later(fn, ms) { this.timers.push(setTimeout(fn, ms)); }
+
+  componentWillUnmount() {
+    this.timers.forEach(function (t) { clearTimeout(t); });
+    this.stopWaves();
+    if (this.glideRaf) cancelAnimationFrame(this.glideRaf);
+    if (this.io) this.io.disconnect();
+    if (this.rootEl) {
+      this.rootEl.removeEventListener('wheel', this.onWheel);
+      this.rootEl.removeEventListener('pointermove', this.onPtr);
+      this.rootEl.removeEventListener('pointerleave', this.onPtrLeave);
+    }
+    window.removeEventListener('scroll', this.onScroll);
+    this.endDragListeners();
+  }
+
+  /* ── background waves ── */
+  setCanvas(el) {
+    if (el && el !== this.canvasEl) { this.canvasEl = el; this.startWaves(el); }
+    if (!el) { this.stopWaves(); this.canvasEl = null; }
+  }
+
+  stopWaves() {
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = 0;
+    if (this.ro) { this.ro.disconnect(); this.ro = null; }
+  }
+
+  startWaves(canvas) {
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    var self = this;
+    var seed = 7;
+    var rand = function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+    var sparks = [];
+    for (var n = 0; n < 90; n++) {
+      var side = rand() < 0.5 ? rand() * 0.36 : 0.64 + rand() * 0.36;
+      sparks.push({ x: side, y: rand(), r: 0.6 + rand() * 1.6, speed: 0.008 + rand() * 0.02, drift: 0.004 + rand() * 0.01, phase: rand() * 6.28 });
+    }
+    var w = 0, h = 0;
+    var resize = function () {
+      var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      w = canvas.clientWidth; h = canvas.clientHeight;
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    if (window.ResizeObserver) { this.ro = new ResizeObserver(resize); this.ro.observe(canvas); }
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var start = performance.now(), last = start;
+    var loop = function (now) {
+      var dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
+      var animate = self.props.animateWaves !== false && !reduce;
+      var t = animate ? (now - start) / 1000 : 2;
+      if (self.heroP < 0.999) {
+        self.drawWaves(ctx, w, h, t, sparks);
+        ctx.globalCompositeOperation = 'lighter';
+        self.drawBursts(ctx);
+        ctx.globalCompositeOperation = 'source-over';
+        self.stepTags(now, dt);
+      }
+      self.drawCards(t);
+      self.raf = requestAnimationFrame(loop);
+    };
+    this.raf = requestAnimationFrame(loop);
+  }
+
+  drawWaves(ctx, w, h, t, sparks) {
+    ctx.clearRect(0, 0, w, h);
+    ctx.globalCompositeOperation = 'lighter';
+    var glow = function (x, y, r, c) {
+      var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, c); g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2);
+    };
+    glow(w * 0.14, h * 0.5, w * 0.34, 'rgba(255,120,20,0.16)');
+    glow(w * 0.86, h * 0.5, w * 0.34, 'rgba(255,30,130,0.16)');
+    glow(w * 0.5, h * 0.62, w * 0.3, 'rgba(150,40,160,0.10)');
+    var narrow = w < 700;
+    var lines = narrow ? 20 : 34, step = narrow ? 6 : 4, reach = w * (narrow ? 0.62 : 0.56);
+    var sides = [
+      { dir: 1, from: [255, 120, 20], to: [255, 200, 90] },
+      { dir: -1, from: [255, 30, 135], to: [255, 95, 120] }
+    ];
+    for (var si = 0; si < 2; si++) {
+      var s = sides[si];
+      for (var j = 0; j < 7; j++) {
+        var bx = s.dir === 1 ? w * (0.065 + j * 0.011) : w - w * (0.065 + j * 0.011);
+        var bh = h * (0.05 + 0.05 * (0.5 + 0.5 * Math.sin(t * 1.4 + j * 1.7)));
+        var by = h * 0.43;
+        var bg = ctx.createLinearGradient(0, by - bh, 0, by);
+        bg.addColorStop(0, 'rgba(0,0,0,0)');
+        bg.addColorStop(1, 'rgba(' + s.from[0] + ',' + s.from[1] + ',' + s.from[2] + ',0.35)');
+        ctx.fillStyle = bg; ctx.fillRect(bx, by - bh, 2.5, bh);
+      }
+      for (var i = 0; i < lines; i++) {
+        var mix = i / (lines - 1), k = mix - 0.5;
+        var r = Math.round(s.from[0] + (s.to[0] - s.from[0]) * mix);
+        var g = Math.round(s.from[1] + (s.to[1] - s.from[1]) * mix);
+        var b = Math.round(s.from[2] + (s.to[2] - s.from[2]) * mix);
+        for (var px = 0; px <= reach; px += step) {
+          var u = px / reach;
+          var spread = h * 0.56 * Math.pow(1 - u, 1.1) + h * 0.02;
+          var y = h * (0.5 + 0.08 * u) + k * spread
+            + Math.sin(u * 3.4 + t * 0.5 + i * 0.09) * h * 0.09 * (1 - u * 0.5)
+            + Math.sin(u * 1.4 - t * 0.3 + i * 0.03) * h * 0.06;
+          var x = s.dir === 1 ? px : w - px;
+          var core = Math.max(0.08, 1 - Math.abs(k) * 1.3);
+          var tw = 0.7 + 0.3 * Math.sin(px * 0.31 + t * 2.2 + i);
+          var a = 0.95 * Math.pow(1 - u, 0.55) * core * tw;
+          if (a < 0.02) continue;
+          ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a.toFixed(3) + ')';
+          ctx.fillRect(x, y, 1.8, 1.8);
+        }
+      }
+      ctx.shadowColor = 'rgb(' + s.from[0] + ',' + s.from[1] + ',' + s.from[2] + ')';
+      ctx.shadowBlur = 14; ctx.lineWidth = 1.4;
+      var crests = [-0.18, -0.04, 0.1];
+      for (var c = 0; c < crests.length; c++) {
+        var kk = crests[c];
+        ctx.beginPath();
+        for (var qx = 0; qx <= reach * 0.92; qx += 8) {
+          var uu = qx / reach;
+          var sp = h * 0.56 * Math.pow(1 - uu, 1.1) + h * 0.02;
+          var yy = h * (0.5 + 0.08 * uu) + kk * sp
+            + Math.sin(uu * 3.4 + t * 0.5 + (kk + 0.5) * 3) * h * 0.09 * (1 - uu * 0.5)
+            + Math.sin(uu * 1.4 - t * 0.3) * h * 0.06;
+          var xx = s.dir === 1 ? qx : w - qx;
+          if (qx === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+        }
+        var sg = ctx.createLinearGradient(s.dir === 1 ? 0 : w, 0, s.dir === 1 ? reach : w - reach, 0);
+        sg.addColorStop(0, 'rgba(' + s.to[0] + ',' + s.to[1] + ',' + s.to[2] + ',0.55)');
+        sg.addColorStop(1, 'rgba(' + s.to[0] + ',' + s.to[1] + ',' + s.to[2] + ',0)');
+        ctx.strokeStyle = sg; ctx.stroke();
+      }
+      ctx.shadowBlur = 0;
+    }
+    for (var p = 0; p < sparks.length; p++) {
+      var sk = sparks[p];
+      var sy = (((sk.y - t * sk.speed) % 1) + 1) % 1;
+      var sx = sk.x + Math.sin(t * 0.4 + sk.phase) * sk.drift;
+      var sa = 0.25 + 0.55 * (0.5 + 0.5 * Math.sin(t * 2 + sk.phase));
+      ctx.fillStyle = sx < 0.5 ? 'rgba(255,150,50,' + sa.toFixed(3) + ')' : 'rgba(255,60,150,' + sa.toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(sx * w, sy * h, sk.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /* ── builder logic ── */
+  dirty(extra) {
+    var patch = { error: null };
+    if (this.state.status === 'ready') patch.status = 'idle';
+    this.setState(Object.assign(patch, extra || {}));
+  }
+
+  toggleCat(id) {
+    var self = this, s = this.state;
+    if (s.open === id) {
+      this.setState({ closing: true });
+      this.later(function () { self.setState({ open: null, closing: false }); }, 140);
+    } else if (s.open) {
+      this.setState({ closing: true });
+      this.later(function () { self.setState({ open: id, closing: false }); }, 140);
+    } else {
+      this.setState({ open: id, closing: false });
+    }
+  }
+
+  toggleOpt(id, value) {
+    var self = this, cat = this.byId[id], cur = this.state.sel[id];
+    var on = cur.indexOf(value) > -1;
+    if (!on && cat.max > 1 && cur.length >= cat.max) {
+      this.setState({ nudge: id });
+      this.later(function () { self.setState({ nudge: null }); }, 1400);
+      return;
+    }
+    var next = on ? cur.filter(function (v) { return v !== value; }) : (cat.max === 1 ? [value] : cur.concat([value]));
+    var sel = Object.assign({}, this.state.sel); sel[id] = next;
+    this.dirty({ sel: sel });
+  }
+
+  removeTag(id, value) {
+    var self = this, key = id + ':' + value;
+    var leaving = Object.assign({}, this.state.leaving); leaving[key] = true;
+    this.setState({ leaving: leaving });
+    this.later(function () {
+      var sel = Object.assign({}, self.state.sel);
+      sel[id] = sel[id].filter(function (v) { return v !== value; });
+      var lv = Object.assign({}, self.state.leaving); delete lv[key];
+      self.dirty({ sel: sel, leaving: lv });
+    }, 200);
+  }
+
+  compose() {
+    var s = this.state, parts = [];
+    var order = ['genre', 'mood', 'vocals', 'instruments', 'production'];
+    order.forEach(function (id) {
+      s.sel[id].forEach(function (v) {
+        if (id === 'vocals') parts.push(v === 'Instrumental' ? 'instrumental' : v.toLowerCase() + ' vocals');
+        else parts.push(v.toLowerCase());
+      });
+    });
+    if (s.advTouched) {
+      parts.push(s.bpm + ' BPM');
+      if (s.musicKey !== 'Any key') parts.push(s.musicKey);
+    }
+    return { style: parts.join(', '), idea: s.text.trim() };
+  }
+
+  totalSelected() {
+    var s = this.state, n = 0;
+    this.cats.forEach(function (c) { n += s.sel[c.id].length; });
+    return n;
+  }
+
+  renderVals() {
+    var self = this, s = this.state;
+
+    var tags = [];
+    this.cats.forEach(function (c) {
+      s.sel[c.id].forEach(function (v) {
+        var key = c.id + ':' + v;
+        tags.push({ label: v, aria: 'Remove ' + v, cls: 'tag c-' + c.id + (s.leaving[key] ? ' out' : ''), remove: function () { self.removeTag(c.id, v); } });
+      });
+    });
+
+    var chips = {};
+    this.cats.forEach(function (c) {
+      var active = s.open === c.id && !s.closing;
+      var count = s.sel[c.id].length;
+      chips[c.id] = {
+        cls: 'chip sp c-' + c.id + (active ? ' active' : ''),
+        selected: active ? 'true' : 'false',
+        count: count, has: count > 0,
+        toggle: function () { self.toggleCat(c.id); }
+      };
+    });
+
+    var cat = s.open ? this.byId[s.open] : null;
+    var options = cat ? cat.options.map(function (o) {
+      var on = s.sel[cat.id].indexOf(o) > -1;
+      return { label: o, on: on, pressed: on ? 'true' : 'false', cls: 'opt sp' + (on ? ' on' : ''), pick: function () { self.toggleOpt(cat.id, o); } };
+    }) : [];
+
+    var res = s.result || { style: '', idea: '' };
+
+    var pre = function (k) { return s.seen[k] === false ? 'pre' : ''; };
+
+    return {
+      streamOn: this.props.streamingTags !== false,
+      stream: this.slots.map(function (sl, i) {
+        return { label: sl.label, cls: 'st c-' + sl.cat, ref: self.slotRef[i], down: self.slotDown[i], enter: self.slotEnter[i], leave: self.slotLeave[i] };
+      }),
+      setLayer: this.setLayer, setBar: this.setBar,
+      showHint: tags.length === 0,
+      pausePressed: s.paused ? 'true' : 'false',
+      pauseLabel: s.paused ? 'Resume floating styles' : 'Pause floating styles',
+      showPauseIcon: !s.paused, showPlayIcon: s.paused,
+      pauseShort: s.paused ? 'Play styles' : 'Pause styles',
+      togglePause: function () { self.setState({ paused: !self.state.paused }); },
+
+      setRoot: this.setRoot, setHero: this.setHero, setExplore: this.setExplore,
+      setRv: this.revealRefs,
+      setCard0: this.setCard[0], setCard1: this.setCard[1], setCard2: this.setCard[2],
+      rv: { exploreHead: pre('exploreHead'), cards: pre('cards'), pricingHead: pre('pricingHead'), plans: pre('plans'), faq: pre('faq'), footer: pre('footer') },
+      toExplore: function () { self.glideToExplore(); },
+      navExplore: function (e) { if (e) e.preventDefault(); self.glideToExplore(); },
+      navBuild: function (e) { if (e) e.preventDefault(); self.glideToBuilder(); },
+      sheetExplore: function (e) { if (e) e.preventDefault(); self.setState({ nav: false }); self.glideToExplore(); },
+      faqItems: this.faqs.map(function (f, i) {
+        var open = s.faq === i;
+        return {
+          q: f.q, a: f.a, open: open, expanded: open ? 'true' : 'false',
+          cls: 'faq-item' + (open ? ' open' : ''), qid: 'faq-q' + i, aid: 'faq-a' + i,
+          toggle: function () { self.setState({ faq: self.state.faq === i ? -1 : i }); }
+        };
+      }),
+
+      setCanvas: this.setCanvas,
+      navOpen: s.nav, navClosed: !s.nav,
+      navLabel: s.nav ? 'Close menu' : 'Open menu', navExpanded: s.nav ? 'true' : 'false',
+      toggleNav: function () { self.setState({ nav: !self.state.nav }); },
+
+      text: s.text,
+      onText: function (e) { self.dirty({ text: e.target.value }); },
+      onIdeaKey: function (e) {
+        if (e.key === 'Enter') self.create();
+        if (e.key === 'Escape' && self.state.open) self.toggleCat(self.state.open);
+      },
+      surprise: function () {
+        var pick = function (arr, n) { return arr.slice().sort(function () { return Math.random() - 0.5; }).slice(0, n); };
+        self.dirty({
+          text: self.ideas[Math.floor(Math.random() * self.ideas.length)],
+          leaving: {},
+          sel: {
+            genre: pick(self.byId.genre.options, 1 + Math.round(Math.random())),
+            mood: pick(self.byId.mood.options, 1),
+            instruments: pick(self.byId.instruments.options, 2),
+            vocals: pick(self.byId.vocals.options, 1),
+            production: pick(self.byId.production.options, 1)
+          }
+        });
+      },
+
+      barCls: 'bar-wrap' + (s.shake ? ' shake' : '') + (s.dragging ? ' drop-ready' : '') + (s.dropHot ? ' drop-hot' : ''),
+      advOpen: s.adv,
+      advExpanded: s.adv ? 'true' : 'false',
+      advBtnCls: 'icon-btn sp' + (s.adv ? ' on' : ''),
+      toggleAdv: function () { self.setState({ adv: !self.state.adv }); },
+
+      building: s.status === 'building',
+      notBuilding: s.status !== 'building',
+      create: function () { self.create(); },
+
+      hasTags: tags.length > 0,
+      tags: tags,
+      clearAll: function () { self.dirty({ sel: { genre: [], mood: [], instruments: [], vocals: [], production: [] }, leaving: {} }); },
+
+      bpm: s.bpm, weird: s.weird, influence: s.influence, musicKey: s.musicKey, keys: this.keys,
+      onBpm: function (e) { self.dirty({ bpm: Number(e.target.value), advTouched: true }); },
+      onWeird: function (e) { self.dirty({ weird: Number(e.target.value), advTouched: true }); },
+      onInfluence: function (e) { self.dirty({ influence: Number(e.target.value), advTouched: true }); },
+      onMusicKey: function (e) { self.dirty({ musicKey: e.target.value, advTouched: true }); },
+
+      excludes: s.excludes.map(function (x) {
+        return { label: x, aria: 'Stop excluding ' + x, remove: function () { self.dirty({ excludes: self.state.excludes.filter(function (v) { return v !== x; }) }); } };
+      }),
+      excludeDraft: s.excludeDraft,
+      excludePlaceholder: s.excludes.length ? '' : 'e.g. autotune, EDM drops',
+      onExcludeDraft: function (e) { self.setState({ excludeDraft: e.target.value }); },
+      onExcludeKey: function (e) {
+        var st = self.state;
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          var v = st.excludeDraft.trim();
+          if (v && st.excludes.indexOf(v) === -1) self.dirty({ excludes: st.excludes.concat([v]), excludeDraft: '' });
+          else self.setState({ excludeDraft: '' });
+        }
+        if (e.key === 'Backspace' && !st.excludeDraft && st.excludes.length) self.dirty({ excludes: st.excludes.slice(0, -1) });
+      },
+
+      hasError: !!s.error, error: s.error || '',
+
+      chips: chips,
+      hasPanel: !!cat,
+      panelCls: 'panel' + (cat ? ' c-' + cat.id : '') + (s.closing ? ' out' : ''),
+      hint: cat ? (s.nudge === cat.id ? 'Max ' + cat.max + ' — remove one to add another.' : cat.hint) : '',
+      hintCls: 'hint' + (cat && s.nudge === cat.id ? ' nudge' : ''),
+      options: options,
+      closePanel: function () { if (self.state.open) self.toggleCat(self.state.open); },
+
+      ready: s.status === 'ready' && !!s.result,
+      hasIdea: !!res.idea, resultIdea: res.idea,
+      hasStyle: !!res.style, resultStyle: res.style, styleChars: res.style.length,
+      hasExcludeText: s.excludes.length > 0, excludeText: s.excludes.join(', '),
+      advTouched: s.advTouched,
+      copyLabel: s.copy === 'ok' ? 'Copied' : (s.copy === 'fail' ? 'Select text' : 'Copy'),
+      copy: function () { self.copy(); },
+      reset: function () {
+        self.setState({
+          text: '', sel: { genre: [], mood: [], instruments: [], vocals: [], production: [] }, leaving: {},
+          bpm: 100, musicKey: 'Any key', weird: 50, influence: 60, advTouched: false, excludes: [], excludeDraft: '',
+          status: 'idle', result: null, open: null, closing: false, adv: false, error: null
+        });
+      }
+    };
+  }
+
+  create() {
+    var self = this;
+    if (this.state.status === 'building') return;
+    if (!this.state.text.trim() && this.totalSelected() === 0) {
+      this.setState({ error: 'Describe a track or pick a few tags first.', shake: true });
+      this.later(function () { self.setState({ shake: false }); }, 460);
+      return;
+    }
+    this.setState({ status: 'building', open: null, closing: false, copy: 'idle', error: null });
+    this.later(function () { self.setState({ status: 'ready', result: self.compose() }); }, 1100);
+  }
+
+  copy() {
+    var self = this, s = this.state, r = s.result;
+    if (!r) return;
+    var lines = [];
+    if (r.idea) lines.push('Idea: ' + r.idea);
+    if (r.style) lines.push('Style: ' + r.style);
+    if (s.excludes.length) lines.push('Exclude: ' + s.excludes.join(', '));
+    var done = function (ok) {
+      self.setState({ copy: ok ? 'ok' : 'fail' });
+      self.later(function () { self.setState({ copy: 'idle' }); }, 1800);
+    };
+    try {
+      navigator.clipboard.writeText(lines.join('\n')).then(function () { done(true); }, function () { done(false); });
+    } catch (err) { done(false); }
+  }
+}
+</script>
+</body>
+</html>
