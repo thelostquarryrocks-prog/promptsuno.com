@@ -44,13 +44,13 @@ export class SupabaseLimits implements LimitsStore {
   ) {}
 
   private async rpc(fn: string, args: Record<string, unknown>): Promise<unknown> {
+    // New-style secret keys (sb_secret_...) go on the apikey header only: the
+    // platform rejects them in Authorization. Legacy JWT keys need both.
+    const headers: Record<string, string> = { apikey: this.serviceKey, "content-type": "application/json" };
+    if (!this.serviceKey.startsWith("sb_")) headers.authorization = `Bearer ${this.serviceKey}`;
     const res = await this.fetchImpl(`${this.url.replace(/\/$/, "")}/rest/v1/rpc/${fn}`, {
       method: "POST",
-      headers: {
-        apikey: this.serviceKey,
-        authorization: `Bearer ${this.serviceKey}`,
-        "content-type": "application/json",
-      },
+      headers,
       body: JSON.stringify(args),
       cache: "no-store",
     });
