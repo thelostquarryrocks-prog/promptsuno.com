@@ -6,7 +6,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Logo } from "@/components/brand/Logo";
 import { INSTRUMENTAL, PICKER_GROUP_IDS, type PickerGroup, type PickerGroupId } from "@/lib/catalog/picker-shared";
 import type { GenerateRequest, GenerateResponse, GeneratedPrompt } from "@/lib/generate/contract";
@@ -113,10 +112,13 @@ export interface HeroProps {
   groups: PickerGroup[];
   /** Google sign-in is wired up on this deployment. */
   authEnabled: boolean;
+  /** Prompts a free account gets per day, for copy. */
+  dailyFree: number;
+  /** Public Supabase settings, only when sign-in is on. */
+  supabase: { url: string; key: string } | null;
 }
 
-export function Hero({ groups, authEnabled }: HeroProps) {
-  const router = useRouter();
+export function Hero({ groups, authEnabled, dailyFree, supabase }: HeroProps) {
   const byId = useMemo(() => Object.fromEntries(groups.map((g) => [g.id, g])) as Record<PickerGroupId, PickerGroup>, [groups]);
   const pool = useMemo(() => groups.flatMap((g) => g.options.map((label) => ({ label, cat: g.id }))), [groups]);
 
@@ -144,6 +146,7 @@ export function Hero({ groups, authEnabled }: HeroProps) {
   const [signup, setSignup] = useState(false);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [navOpen, setNavOpen] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
 
   // ── stream state ──
   const [stream, setStream] = useState<{ label: string; cat: PickerGroupId }[]>([]);
@@ -359,10 +362,32 @@ export function Hero({ groups, authEnabled }: HeroProps) {
   };
 
   const signIn = () => {
+    // Google redirects away and back; the draft brings their work with them.
     saveDraft({ text, sel, excludes, bpm, musicKey, weird, influence, advTouched, result });
-    // Google sign-in lands in M3. Until then the button explains instead of redirecting.
-    router.push("/auth/sign-in?next=/%23build");
+    window.location.assign(new URL("/auth/sign-in?next=%2F%23build", window.location.origin).toString());
   };
+
+  // Who's signed in. Loaded lazily so visitors don't download the auth client up front.
+  useEffect(() => {
+    if (!supabase) return;
+    let cancelled = false;
+    void import("@supabase/ssr").then(async ({ createBrowserClient }) => {
+      const client = createBrowserClient(supabase.url, supabase.key);
+      const { data } = await client.auth.getClaims();
+      if (!cancelled && data?.claims?.sub) setSignedIn(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase]);
+
+  // A sign-in that didn't finish comes back with ?auth=error.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("auth") !== "error") return;
+    window.history.replaceState(null, "", window.location.pathname + window.location.hash);
+    queueMicrotask(() => flash("Sign-in didn't finish. Try again, and your work will still be here."));
+  }, [flash]);
 
   const copyField = async (key: string, value: string) => {
     const ok = await copyText(value);
@@ -728,8 +753,13 @@ export function Hero({ groups, authEnabled }: HeroProps) {
             <li><a className="navlink" href="#explore">Write Lyrics</a></li>
           </ul>
           <div className="nav-actions" style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {authEnabled && (
+            {authEnabled && !signedIn && (
               <button type="button" className="btn-ghost sp" onClick={signIn}>Sign in</button>
+            )}
+            {signedIn && (
+              <form action="/auth/sign-out" method="post">
+                <button type="submit" className="btn-ghost sp">Sign out</button>
+              </form>
             )}
             <button type="button" className="create nav-cta sp" onClick={focusBuilder}>Get Started</button>
           </div>
@@ -747,8 +777,13 @@ export function Hero({ groups, authEnabled }: HeroProps) {
             <a href="#build" onClick={(e) => { e.preventDefault(); focusBuilder(); }}>Build Prompts</a>
             <a href="#explore" onClick={() => setNavOpen(false)}>Write Lyrics</a>
             <div style={{ display: "grid", gridTemplateColumns: authEnabled ? "repeat(2, minmax(0, 1fr))" : "1fr", gap: 8, marginTop: 8, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-              {authEnabled && (
+              {authEnabled && !signedIn && (
                 <button type="button" className="mini glass sp" style={{ height: 44, justifyContent: "center" }} onClick={signIn}>Sign in</button>
+              )}
+              {signedIn && (
+                <form action="/auth/sign-out" method="post" style={{ display: "grid" }}>
+                  <button type="submit" className="mini glass sp" style={{ height: 44, justifyContent: "center" }}>Sign out</button>
+                </form>
               )}
               <button type="button" className="mini primary sp" style={{ height: 44 }} onClick={focusBuilder}>Get Started</button>
             </div>
@@ -896,7 +931,7 @@ export function Hero({ groups, authEnabled }: HeroProps) {
             <div className="bubble" role="status">
               {authEnabled ? (
                 <>
-                  <strong>Like what you heard?</strong> That was your free prompt. Sign up free with Google for {remaining ?? 20} more every day. Your idea and tags come with you.
+                  <strong>Like what you heard?</strong> That was your free prompt. Sign up free with Google for {dailyFree} prompts every day. Your idea and tags come with you.
                   <div className="bubble-row">
                     <button type="button" className="mini primary sp" onClick={signIn}>Sign up free with Google</button>
                     <button type="button" className="mini glass sp" onClick={() => setSignup(false)}>Not now</button>

@@ -71,7 +71,12 @@ export default function Home() {
   const signInLive = authEnabled();
   return (
     <div className="ps" style={{ position: "relative", background: "#050304", color: "#ffffff", WebkitFontSmoothing: "antialiased" }}>
-      <Hero groups={groups} authEnabled={signInLive} />
+      <Hero
+        groups={groups}
+        authEnabled={signInLive}
+        dailyFree={DAILY_FREE_PROMPTS}
+        supabase={signInLive ? { url: process.env.NEXT_PUBLIC_SUPABASE_URL!, key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! } : null}
+      />
       <WhatIs demoIdea={DEMO_IDEA} demoTags={demoTags()} />
       <Explore />
       <PricingFaq faqs={faqs(signInLive)} dailyFree={DAILY_FREE_PROMPTS} authEnabled={signInLive} />

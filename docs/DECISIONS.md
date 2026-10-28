@@ -2,6 +2,15 @@
 
 Calls made during the v1 build that depart from the comp or the Ship Brief, or that someone will wonder about later. One line each, newest first. The Ship Brief lives in the claude.ai project docs.
 
+## 2026-10-28 · M3 accounts (code)
+
+- Google sign-in runs on the server with PKCE (`/auth/sign-in` → Google → `/auth/callback`), using `@supabase/ssr` on plain Request and Response objects. There's no proxy/middleware: the API route refreshes the session when it reads it and passes the new cookies along.
+- Sign-out is POST-only, so a link or prefetch can't sign anyone out.
+- `next` redirects accept same-site paths only, to stop open redirects.
+- The browser's auth client loads lazily, only when sign-in is on, so visitors don't download it up front.
+- The bubble promises the daily allowance (20), not a remaining count, which visitors don't have.
+- The Supabase publishable key (`sb_publishable_`) is used as the public key. New-style keys are the platform's recommendation, and RLS protects the data.
+
 ## 2026-10-28 · M2 generation and limits
 
 - Limits are enforced inside Postgres (`claim_generation` and `finish_generation`), with a row lock so two fast requests can't both slip past a limit. RLS is on with no policies; only the service role can call the functions. Tested against a local Postgres 16.
