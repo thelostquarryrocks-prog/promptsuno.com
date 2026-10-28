@@ -2,6 +2,16 @@
 
 Calls made during the v1 build that depart from the comp or the Ship Brief, or that someone will wonder about later. One line each, newest first. The Ship Brief lives in the claude.ai project docs.
 
+## 2026-10-28 · M2 generation and limits
+
+- Limits are enforced inside Postgres (`claim_generation` and `finish_generation`), with a row lock so two fast requests can't both slip past a limit. RLS is on with no policies; only the service role can call the functions. Tested against a local Postgres 16.
+- Defaults live in one `generation_settings` row and change without a deploy: 1 prompt per visitor per day, 5 per IP per day, 300 signed-out per day across the site, 20 per day and 3 per minute per signed-in user. Days are UTC.
+- `anon_enabled` is the kill switch. Hitting the 300 ceiling turns it off automatically, and it stays off until someone turns it back on.
+- Failed generations are recorded as failed and never count against anyone.
+- Visitors get an HttpOnly `ps_v` cookie. The token and the IP are stored only as keyed hashes (HMAC-SHA256).
+- Styles picked in the builder are merged with the styles found in the idea text. The writer on its own would replace one with the other.
+- The Sign in button needs `NEXT_PUBLIC_GOOGLE_SIGNIN=on` as well as Supabase, because the database goes live before Google sign-in does.
+
 ## 2026-10-28 · M1 homepage
 
 - Next.js 16.4.0 → 16.4.3: three critical advisories (incl. remote code execution in image optimization and `use cache`). Also applied the non-breaking fix for a dev-only zod advisory.
