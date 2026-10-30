@@ -194,6 +194,20 @@ export function Hero({ groups, authEnabled, dailyFree, supabase }: HeroProps) {
     [later],
   );
 
+  // "Open in builder" from Learn: /?idea=...#build fills the idea box.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const idea = params.get("idea");
+    if (!idea) return;
+    params.delete("idea");
+    const rest = params.toString();
+    window.history.replaceState(null, "", window.location.pathname + (rest ? `?${rest}` : "") + window.location.hash);
+    queueMicrotask(() => {
+      setText(idea.slice(0, 500));
+      ideaRef.current?.focus({ preventScroll: true });
+    });
+  }, []);
+
   // Bring back work saved before a sign-in redirect.
   useEffect(() => {
     const d = takeDraft();
@@ -748,7 +762,7 @@ export function Hero({ groups, authEnabled, dailyFree, supabase }: HeroProps) {
             <span style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em" }}>PromptSuno</span>
           </Link>
           <ul className="nav-center">
-            <li><a className="navlink" href="#explore">Learn Suno</a></li>
+            <li><Link className="navlink" href="/learn">Learn Suno</Link></li>
             <li><a className="navlink" href="#build" onClick={(e) => { e.preventDefault(); focusBuilder(); }}>Build Prompts</a></li>
             <li><a className="navlink" href="#explore">Write Lyrics</a></li>
           </ul>
@@ -773,7 +787,7 @@ export function Hero({ groups, authEnabled, dailyFree, supabase }: HeroProps) {
         </nav>
         {navOpen && (
           <div className="sheet">
-            <a href="#explore" onClick={() => setNavOpen(false)}>Learn Suno</a>
+            <Link href="/learn" onClick={() => setNavOpen(false)}>Learn Suno</Link>
             <a href="#build" onClick={(e) => { e.preventDefault(); focusBuilder(); }}>Build Prompts</a>
             <a href="#explore" onClick={() => setNavOpen(false)}>Write Lyrics</a>
             <div style={{ display: "grid", gridTemplateColumns: authEnabled ? "repeat(2, minmax(0, 1fr))" : "1fr", gap: 8, marginTop: 8, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.1)" }}>

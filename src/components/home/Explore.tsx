@@ -1,9 +1,10 @@
 "use client";
 
-// "Go deeper with Suno": Learn / Build / Write. Build is live (it's the hero);
-// Learn and Write are coming soon. The ribbon art only animates while the
+// "Go deeper with Suno": Learn / Build / Write. Learn and Build are live;
+// Write is coming soon. The ribbon art only animates while the
 // cards are on screen.
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { drawRibbon, type RGB } from "./canvas-art";
 import { Reveal } from "./Reveal";
@@ -87,8 +88,8 @@ export function Explore() {
                 </span>
                 <h3 className="xtitle">LEARN</h3>
                 <p className="xsub">Suno v6 knowledge base</p>
-                <p className="xdesc">Step-by-step guides, tutorials and best practices to help you master Suno v6.</p>
-                <span className="soon" style={{ marginTop: "auto" }}>COMING SOON</span>
+                <p className="xdesc">Five short modules, from your first prompt to the tricks experienced creators use.</p>
+                <Link className="xbtn" href="/learn">Start learning<Arrow /></Link>
               </div>
             </article>
           </div>
