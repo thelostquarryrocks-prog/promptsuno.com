@@ -2,6 +2,17 @@
 
 Calls made during the v1 build that depart from the comp or the Ship Brief, or that someone will wonder about later. One line each, newest first. The Ship Brief lives in the claude.ai project docs.
 
+## 2026-10-30 · Learn v1 (separate PR, its own go/no-go)
+
+- Learn ships Sunday only if James has read it by Saturday evening; otherwise it goes out midweek. The launch doesn't wait for it.
+- The handoff package's content was rewritten, not copied. Removed: every invented "% Verified" score, the decay-curve percentages, millisecond timings, "+20–30% volume" and claims about Suno's internals (G2P, context windows, training metadata). Advice is labelled by where it comes from: what Suno documents versus common creator technique.
+- Corrected against Suno's own posts: Speech (beta) generates voice and music from typed text (not "Speech-to-Soundtrack" for recorded voice); Advanced Split is Premier only; mashups are your own songs only; the "8-minute" length was removed (unconfirmed).
+- Added what the package missed: Suno's Exclude Styles field (Module 3) and links to PromptSuno's builder.
+- The "Verified Tag Vault" (30 entries with made-up scores) became a style library built from our own launch catalog (the same styles the builder uses), showing honest relationship counts.
+- Built: Markdown modules in `content/learn`, server-rendered and prerendered (one URL each, in the sitemap); copyable inline tags; style and lyrics blocks with Copy and "Open in builder" (`/?idea=...`); a syllable counter and a spelling converter (the package's utilities, fixed: "string" no longer becomes "strin'", runs land on the sung vowel).
+- Left out for V2: the tag cart, progress tracking, Cmd+K, SoundBrain 3D, and the energy-curve, decay and splice diagrams. Framer Motion and Three.js aren't added.
+- Design: the package's palette was dropped in favour of the homepage's (gradient, chips, cards, copy buttons).
+
 ## 2026-10-30 · Launch setup
 
 - The domain is set up with `promptsuno.com` redirecting (308) to `www.promptsuno.com`, so `www` is the canonical address: `NEXT_PUBLIC_SITE_URL`, sitemap, canonical tags, and the Supabase and Google sign-in URLs. Flipping it later is fine, as long as those change too.
