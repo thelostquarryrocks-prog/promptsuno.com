@@ -2,6 +2,11 @@
 
 Calls made during the v1 build that depart from the comp or the Ship Brief, or that someone will wonder about later. One line each, newest first. The Ship Brief lives in the claude.ai project docs.
 
+## 2026-10-30 · Launch setup
+
+- The domain is set up with `promptsuno.com` redirecting (308) to `www.promptsuno.com`, so `www` is the canonical address: `NEXT_PUBLIC_SITE_URL`, sitemap, canonical tags, and the Supabase and Google sign-in URLs. Flipping it later is fine, as long as those change too.
+- Contact address: support@promptsuno.com (`NEXT_PUBLIC_CONTACT_EMAIL`).
+
 ## 2026-10-28 · M3 accounts (code)
 
 - Google sign-in runs on the server with PKCE (`/auth/sign-in` → Google → `/auth/callback`), using `@supabase/ssr` on plain Request and Response objects. There's no proxy/middleware: the API route refreshes the session when it reads it and passes the new cookies along.
